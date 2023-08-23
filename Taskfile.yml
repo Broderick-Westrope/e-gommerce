@@ -17,3 +17,7 @@ tasks:
     desc: "lint the code"
     cmds:
       - golangci-lint run
+  run:
+    desc: "runs the API"
+    cmds:
+      - go run ./cmd/web/
