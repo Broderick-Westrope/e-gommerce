@@ -36,9 +36,17 @@ func main() {
 }
 
 func (app *application) handleRequests() *chi.Mux {
-	mux := chi.NewRouter()
+	r := chi.NewRouter()
 
-	mux.Get("/", app.home)
+	r.Get("/", app.home)
 
-	return mux
+	r.Route("/products", func(r chi.Router) {
+		r.Get("/", app.getProducts)
+		r.Get("/{id}", app.getProduct)
+		r.Post("/{id}", app.createProduct)
+		r.Put("/{id}", app.updateProduct)
+		r.Delete("/{id}", app.deleteProduct)
+	})
+
+	return r
 }
