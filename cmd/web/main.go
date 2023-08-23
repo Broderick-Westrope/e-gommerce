@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/go-chi/chi/v5"
 )
 
 type application struct {
@@ -33,10 +35,10 @@ func main() {
 	app.logger.Error(err.Error())
 }
 
-func (app *application) handleRequests() *http.ServeMux {
-	mux := http.NewServeMux()
+func (app *application) handleRequests() *chi.Mux {
+	mux := chi.NewRouter()
 
-	mux.HandleFunc("/", app.home)
+	mux.Get("/", app.home)
 
 	return mux
 }
