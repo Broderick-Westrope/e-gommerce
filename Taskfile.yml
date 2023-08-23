@@ -1,0 +1,15 @@
+# https://taskfile.dev
+
+version: '3'
+
+tasks:
+  build:
+    cmds:
+      - mkdir -p build
+      - go build -o ./build/ ./cmd/web/
+  test:
+    cmds:
+      - go test ./... -cover
+  lint:
+    cmds:
+      - golangci-lint run
