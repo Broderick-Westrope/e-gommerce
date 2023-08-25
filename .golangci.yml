@@ -116,6 +116,8 @@ linters-settings:
       - os.WriteFile
       - prometheus.ExponentialBuckets.*
       - prometheus.LinearBuckets
+      - tabwriter.NewWriter
+      - tabwriter.Init
 
   gomodguard:
     blocked:
