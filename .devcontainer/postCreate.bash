@@ -8,7 +8,3 @@ golangci-lint --version
 
 # install task for taskfile
 go install github.com/go-task/task/v3/cmd/task@latest
-
-# install mariadb
-sudo apt update
-sudo apt install -y mariadb-server
