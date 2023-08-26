@@ -61,6 +61,7 @@ func createProduct(srv Server) http.HandlerFunc {
 		if err != nil {
 			srv.Logger().Error(err.Error())
 		}
+		w.WriteHeader(http.StatusCreated)
 		msg := fmt.Sprintf("Create product %d", id)
 		_, err = w.Write([]byte(msg))
 		if err != nil {
