@@ -24,9 +24,7 @@ func (m Maria) GetProduct(id int) (*models.Product, error) {
 	row := m.DB.QueryRow(query, id)
 
 	result := &models.Product{}
-	err := row.Scan(result.ID, result.Name, result.Description,
-		result.Price, result.StockQuantity,
-		result.CreatedAt, result.UpdatedAt)
+	err := row.Scan(result.ID, result.Name, result.Description, result.Price, result.StockQuantity)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +44,7 @@ func (m Maria) GetProducts() (*[]models.Product, error) {
 	result := &[]models.Product{}
 	for rows.Next() {
 		row := models.Product{}
-		err = rows.Scan(&row.ID, &row.Name, &row.Description, &row.Price, &row.StockQuantity, &row.CreatedAt, &row.UpdatedAt)
+		err = rows.Scan(&row.ID, &row.Name, &row.Description, &row.Price, &row.StockQuantity)
 		if err != nil {
 			return nil, err
 		}
