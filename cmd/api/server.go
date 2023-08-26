@@ -19,7 +19,8 @@ type chiServer struct {
 	logger  config.Logger
 }
 
-// NewServer is a factory function that returns a Server interface based on the mode passed in. The Server is initialized with the config passed in.
+// NewServer is a factory function that returns a Server interface based on the mode passed in.
+// The Server is initialized with the config passed in.
 func NewServer(mode string, config config.Config) Server {
 	if mode == "chi" {
 		return &chiServer{

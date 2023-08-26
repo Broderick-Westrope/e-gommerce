@@ -1,6 +1,7 @@
-package api
+package api_test
 
 import (
+	"github.com/Broderick-Westrope/e-gommerce/cmd/api"
 	"github.com/Broderick-Westrope/e-gommerce/internal/config"
 	"github.com/Broderick-Westrope/e-gommerce/internal/models"
 	"github.com/Broderick-Westrope/e-gommerce/internal/storage"
@@ -35,7 +36,7 @@ func (srv *testServer) Logger() config.Logger {
 
 func (srv *testServer) MountHandlers() {
 	srv.mux.Route("/v1", func(r chi.Router) {
-		r.Mount("/api/products", ProductRoutes(srv))
+		r.Mount("/api/products", api.ProductRoutes(srv))
 	})
 }
 
