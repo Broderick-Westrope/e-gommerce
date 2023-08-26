@@ -28,7 +28,7 @@ It also offers several features that enhance our development process:
 
 ## Consequences
 
-## Advantages
+### Advantages
 
 **Performance**: Chi is known for its exceptional performance due to its minimalistic design and efficient routing mechanisms. This will ensure that our e-commerce backend can handle a high volume of requests without introducing significant latency.
 
@@ -38,12 +38,12 @@ It also offers several features that enhance our development process:
 
 **Scalability**: Chi's design allows for efficient handling of routes and middleware, which is crucial for ensuring the backend can scale gracefully as the e-commerce platform attracts more users.
 
-## Challenges and Mitigations
+### Challenges and Mitigations
 
 **Learning Curve**: While Chi is lightweight, it might still have a learning curve for those unfamiliar with routing concepts. To mitigate this, we will provide documentation, tutorials, and possibly pair programming sessions to help team members get up to speed.
 
 **Community and Support**: Chi, although widely used, might have a smaller community compared to some other router options. To address this, we will actively participate in relevant online communities and forums, and contribute back to the open-source project if possible.
 
-## Summary
+### Summary
 
 By adopting Chi for our Golang-based e-commerce backend, we anticipate smoother handling of routes, efficient middleware integration, and overall better performance. The built-in support for method-based routing, easy query parameter handling, and clean syntax for grouping routes will contribute to a more organized and maintainable codebase. The fact that Chi has extensive support for middleware built using the standard library `net/http` package is advantageous, as it allows us to capitalize on existing knowledge. Additionally, the minimal external dependencies of Chi align well with our goal of maintaining a lightweight project. While there might be a learning curve and potential community challenges, the benefits in terms of scalability, flexibility, and learning outweigh the drawbacks. This decision aligns with our goal of creating a learning opportunity that can eventually grow into a large-scale project.
