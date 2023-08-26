@@ -64,24 +64,19 @@ func New() Config {
 		logger = NewSlog()
 	}
 
-	var exists bool
-	var dbUsername, dbPassword, dbAddress, dbName string
-	if dbUsername, exists = os.LookupEnv("DB_USERNAME"); !exists {
-		logger.Error("DB_USERNAME not found")
-		os.Exit(1)
+	db := setupDB(logger)
+	storage := storage.NewMaria(db)
+
+	return &config{
+		addr:              addr,
+		readHeaderTimeout: readHeaderTimeout,
+		logger:            logger,
+		storage:           storage,
 	}
-	if dbPassword, exists = os.LookupEnv("DB_PASSWORD"); !exists {
-		logger.Error("DB_PASSWORD not found")
-		os.Exit(1)
-	}
-	if dbAddress, exists = os.LookupEnv("DB_ADDRESS"); !exists {
-		logger.Error("DB_ADDRESS not found")
-		os.Exit(1)
-	}
-	if dbName, exists = os.LookupEnv("DB_NAME"); !exists {
-		logger.Error("DB_NAME not found")
-		os.Exit(1)
-	}
+}
+
+func setupDB(logger Logger) *sql.DB {
+	dbUsername, dbPassword, dbAddress, dbName := getDBEnvVariables(logger)
 
 	// Use the mySQL driver and environment variables to create a DSN.
 	mysqlCfg := &mysql.Config{
@@ -103,12 +98,30 @@ func New() Config {
 		os.Exit(1)
 	}
 
-	storage := storage.NewMaria(db)
+	return db
+}
 
-	return &config{
-		addr:              addr,
-		readHeaderTimeout: readHeaderTimeout,
-		logger:            logger,
-		storage:           storage,
+// getDBEnvVariables returns the database environment variables.
+// The variables are DB_USERNAME, DB_PASSWORD, DB_ADDRESS, and DB_NAME.
+func getDBEnvVariables(logger Logger) (string, string, string, string) {
+	var exists bool
+	var dbUsername, dbPassword, dbAddress, dbName string
+	if dbUsername, exists = os.LookupEnv("DB_USERNAME"); !exists {
+		logger.Error("DB_USERNAME not found")
+		os.Exit(1)
 	}
+	if dbPassword, exists = os.LookupEnv("DB_PASSWORD"); !exists {
+		logger.Error("DB_PASSWORD not found")
+		os.Exit(1)
+	}
+	if dbAddress, exists = os.LookupEnv("DB_ADDRESS"); !exists {
+		logger.Error("DB_ADDRESS not found")
+		os.Exit(1)
+	}
+	if dbName, exists = os.LookupEnv("DB_NAME"); !exists {
+		logger.Error("DB_NAME not found")
+		os.Exit(1)
+	}
+
+	return dbUsername, dbPassword, dbAddress, dbName
 }
