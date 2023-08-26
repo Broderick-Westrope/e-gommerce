@@ -7,6 +7,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/Broderick-Westrope/e-gommerce/internal/storage"
 	"github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
 )
@@ -15,7 +16,7 @@ type Config struct {
 	Addr              *string
 	ReadHeaderTimeout *time.Duration
 	Logger            Logger
-	DB                *sql.DB
+	Storage           storage.Storage
 }
 
 // New returns a new config struct.
@@ -75,10 +76,12 @@ func New() *Config {
 		os.Exit(1)
 	}
 
+	storage := storage.NewMaria(db)
+
 	return &Config{
 		Addr:              addr,
 		ReadHeaderTimeout: readHeaderTimeout,
 		Logger:            logger,
-		DB:                db,
+		Storage:           storage,
 	}
 }
