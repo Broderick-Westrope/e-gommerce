@@ -13,7 +13,7 @@ func main() {
 	config := config.New()
 
 	srv := api.NewServer(config)
-	defer srv.Storage().Close()
+	defer srv.Storage.Close()
 
 	router := srv.MountHandlers()
 
@@ -24,15 +24,15 @@ func main() {
 	}
 
 	walkFunc := func(method, route string, handler http.Handler, middleware ...func(http.Handler) http.Handler) error {
-		srv.Logger().Info("Route: "+route, "method", method, "middleware", len(middleware))
+		srv.Logger.Info("Route: "+route, "method", method, "middleware", len(middleware))
 		return nil
 	}
 	if err := chi.Walk(router, walkFunc); err != nil {
-		srv.Logger().Error(err.Error())
+		srv.Logger.Error(err.Error())
 	}
 
-	srv.Logger().Info("Starting server", "addr", config.Addr())
+	srv.Logger.Info("Starting server", "addr", config.Addr())
 	if err := httpServer.ListenAndServe(); err != nil {
-		srv.Logger().Error(err.Error())
+		srv.Logger.Error(err.Error())
 	}
 }

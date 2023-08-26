@@ -22,67 +22,67 @@ func (srv *Server) ProductRoutes() *chi.Mux {
 }
 
 func (srv *Server) getProducts(w http.ResponseWriter, _ *http.Request) {
-	products, err := srv.Storage().GetProducts()
+	products, err := srv.Storage.GetProducts()
 	if err != nil {
-		srv.Logger().Error(err.Error())
+		srv.Logger.Error(err.Error())
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 
 	jsonResponse, err := json.Marshal(products)
 	if err != nil {
-		srv.Logger().Error(err.Error())
+		srv.Logger.Error(err.Error())
 	}
 
 	if _, err = w.Write(jsonResponse); err != nil {
-		srv.Logger().Error(err.Error())
+		srv.Logger.Error(err.Error())
 	}
 }
 
 func (srv *Server) getProductByID(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
-		srv.Logger().Error(err.Error())
+		srv.Logger.Error(err.Error())
 	}
 	msg := fmt.Sprintf("Get product %d", id)
 	_, err = w.Write([]byte(msg))
 	if err != nil {
-		srv.Logger().Error(err.Error())
+		srv.Logger.Error(err.Error())
 	}
 }
 
 func (srv *Server) createProduct(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
-		srv.Logger().Error(err.Error())
+		srv.Logger.Error(err.Error())
 	}
 	msg := fmt.Sprintf("Create product %d", id)
 	_, err = w.Write([]byte(msg))
 	if err != nil {
-		srv.Logger().Error(err.Error())
+		srv.Logger.Error(err.Error())
 	}
 }
 
 func (srv *Server) updateProductByID(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
-		srv.Logger().Error(err.Error())
+		srv.Logger.Error(err.Error())
 	}
 	msg := fmt.Sprintf("Update product %d", id)
 	_, err = w.Write([]byte(msg))
 	if err != nil {
-		srv.Logger().Error(err.Error())
+		srv.Logger.Error(err.Error())
 	}
 }
 
 func (srv *Server) deleteProductByID(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
-		srv.Logger().Error(err.Error())
+		srv.Logger.Error(err.Error())
 	}
 	msg := fmt.Sprintf("Delete product %d", id)
 	_, err = w.Write([]byte(msg))
 	if err != nil {
-		srv.Logger().Error(err.Error())
+		srv.Logger.Error(err.Error())
 	}
 }

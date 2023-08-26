@@ -8,28 +8,20 @@ import (
 
 type Server struct {
 	mux     *chi.Mux
-	storage storage.Storage
-	logger  config.Logger
+	Storage storage.Storage
+	Logger  config.Logger
 }
 
 func NewServer(config config.Config) *Server {
 	return &Server{
 		mux:     chi.NewMux(),
-		storage: config.Storage(),
-		logger:  config.Logger(),
+		Storage: config.Storage(),
+		Logger:  config.Logger(),
 	}
 }
 
-func (srv *Server) Mux() *chi.Mux {
+func (srv *Server) GetMux() *chi.Mux {
 	return srv.mux
-}
-
-func (srv *Server) Storage() storage.Storage {
-	return srv.storage
-}
-
-func (srv *Server) Logger() config.Logger {
-	return srv.logger
 }
 
 func (srv *Server) MountHandlers() *chi.Mux {
