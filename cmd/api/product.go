@@ -21,7 +21,7 @@ func (srv *Server) ProductRoutes() *chi.Mux {
 	return router
 }
 
-func (srv *Server) getProducts(w http.ResponseWriter, r *http.Request) {
+func (srv *Server) getProducts(w http.ResponseWriter, _ *http.Request) {
 	products, err := srv.Storage().GetProducts()
 	if err != nil {
 		srv.Logger().Error(err.Error())
