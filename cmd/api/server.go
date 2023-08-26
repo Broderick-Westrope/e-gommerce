@@ -24,12 +24,8 @@ func (srv *Server) GetMux() *chi.Mux {
 	return srv.mux
 }
 
-func (srv *Server) MountHandlers() *chi.Mux {
-	router := chi.NewRouter()
-
-	router.Route("/v1", func(r chi.Router) {
+func (srv *Server) MountHandlers() {
+	srv.mux.Route("/v1", func(r chi.Router) {
 		r.Mount("/api/products", srv.ProductRoutes())
 	})
-
-	return router
 }
