@@ -34,6 +34,10 @@ func (srv *testServer) Logger() config.Logger {
 	return srv.logger
 }
 
+func (srv *testServer) RateLimit() int {
+	return 100
+}
+
 func (srv *testServer) MountHandlers() {
 	srv.mux.Route("/v1", func(r chi.Router) {
 		r.Mount("/api/products", api.ProductRoutes(srv))

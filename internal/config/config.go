@@ -17,6 +17,7 @@ type Config interface {
 	ReadHeaderTimeout() time.Duration
 	Logger() Logger
 	Storage() storage.Storage
+	RateLimit() int
 }
 
 type config struct {
@@ -24,6 +25,7 @@ type config struct {
 	readHeaderTimeout *time.Duration
 	logger            Logger
 	storage           storage.Storage
+	rateLimit         int
 }
 
 // Addr returns the address to listen on.
@@ -46,10 +48,16 @@ func (c *config) Storage() storage.Storage {
 	return c.storage
 }
 
+// RateLimit returns the rate limit of requests per minute.
+func (c *config) RateLimit() int {
+	return c.rateLimit
+}
+
 // New returns a new config struct.
 func New() Config {
 	addr := flag.String("addr", ":4000", "HTTP network address")
 	readHeaderTimeout := flag.Duration("read-header-timeout", 10*time.Second, "HTTP read header timeout")
+	rateLimit := flag.Int("rate-limit", 10, "requests per minute rate limit")
 
 	flag.Parse()
 
@@ -72,6 +80,7 @@ func New() Config {
 		readHeaderTimeout: readHeaderTimeout,
 		logger:            logger,
 		storage:           storage,
+		rateLimit:         *rateLimit,
 	}
 }
 

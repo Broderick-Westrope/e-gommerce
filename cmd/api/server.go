@@ -15,13 +15,15 @@ type Server interface {
 	Mux() *chi.Mux
 	Storage() storage.Storage
 	Logger() config.Logger
+	RateLimit() int
 	MountHandlers()
 }
 
 type chiServer struct {
-	mux     *chi.Mux
-	storage storage.Storage
-	logger  config.Logger
+	mux       *chi.Mux
+	storage   storage.Storage
+	logger    config.Logger
+	rateLimit int
 }
 
 // NewServer is a factory function that returns a Server interface based on the mode passed in.
@@ -29,9 +31,10 @@ type chiServer struct {
 func NewServer(mode string, config config.Config) Server {
 	if mode == "chi" {
 		return &chiServer{
-			mux:     chi.NewMux(),
-			storage: config.Storage(),
-			logger:  config.Logger(),
+			mux:       chi.NewMux(),
+			storage:   config.Storage(),
+			logger:    config.Logger(),
+			rateLimit: config.RateLimit(),
 		}
 	}
 	return nil
@@ -49,6 +52,10 @@ func (srv *chiServer) Logger() config.Logger {
 	return srv.logger
 }
 
+func (srv *chiServer) RateLimit() int {
+	return srv.rateLimit
+}
+
 func (srv *chiServer) MountHandlers() {
 	// Routes
 	srv.mux.Use(middleware.Logger)
@@ -58,8 +65,8 @@ func (srv *chiServer) MountHandlers() {
 	srv.mux.Use(middleware.Recoverer)
 	srv.mux.Use(middleware.RedirectSlashes)
 	srv.mux.Use(httprate.Limit(
-		10,
-		10*time.Minute,
+		srv.rateLimit,
+		time.Minute,
 		httprate.WithKeyFuncs(httprate.KeyByIP, httprate.KeyByEndpoint),
 	))
 	srv.mux.Route("/v1", func(r chi.Router) {
