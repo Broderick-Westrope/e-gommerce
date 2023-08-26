@@ -12,15 +12,42 @@ import (
 	"github.com/joho/godotenv"
 )
 
-type Config struct {
-	Addr              *string
-	ReadHeaderTimeout *time.Duration
-	Logger            Logger
-	Storage           storage.Storage
+type Config interface {
+	Addr() string
+	ReadHeaderTimeout() time.Duration
+	Logger() Logger
+	Storage() storage.Storage
+}
+
+type config struct {
+	addr              *string
+	readHeaderTimeout *time.Duration
+	logger            Logger
+	storage           storage.Storage
+}
+
+// Addr returns the address to listen on.
+func (c *config) Addr() string {
+	return *c.addr
+}
+
+// ReadHeaderTimeout returns the read header timeout.
+func (c *config) ReadHeaderTimeout() time.Duration {
+	return *c.readHeaderTimeout
+}
+
+// Logger returns the logger.
+func (c *config) Logger() Logger {
+	return c.logger
+}
+
+// Storage returns the storage.
+func (c *config) Storage() storage.Storage {
+	return c.storage
 }
 
 // New returns a new config struct.
-func New() *Config {
+func New() Config {
 	addr := flag.String("addr", ":4000", "HTTP network address")
 	readHeaderTimeout := flag.Duration("read-header-timeout", 10*time.Second, "HTTP read header timeout")
 
@@ -78,10 +105,10 @@ func New() *Config {
 
 	storage := storage.NewMaria(db)
 
-	return &Config{
-		Addr:              addr,
-		ReadHeaderTimeout: readHeaderTimeout,
-		Logger:            logger,
-		Storage:           storage,
+	return &config{
+		addr:              addr,
+		readHeaderTimeout: readHeaderTimeout,
+		logger:            logger,
+		storage:           storage,
 	}
 }

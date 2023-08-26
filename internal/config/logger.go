@@ -28,23 +28,23 @@ func NewSlog() *Slog {
 }
 
 // Debug logs a debug message.
-func (s *Slog) Debug(msg string, args ...interface{}) {
-	s.log.Debug(msg, args...)
+func (srv *Slog) Debug(msg string, args ...interface{}) {
+	srv.log.Debug(msg, args...)
 }
 
 // Info logs an info message.
-func (s *Slog) Info(msg string, args ...interface{}) {
-	s.log.Info(msg, args...)
+func (srv *Slog) Info(msg string, args ...interface{}) {
+	srv.log.Info(msg, args...)
 }
 
 // Warn logs a warning message.
-func (s *Slog) Warn(msg string, args ...interface{}) {
-	s.log.Warn(msg, args...)
+func (srv *Slog) Warn(msg string, args ...interface{}) {
+	srv.log.Warn(msg, args...)
 }
 
 // Error logs an error message.
-func (s *Slog) Error(msg string, args ...interface{}) {
-	s.log.Error(msg, args...)
+func (srv *Slog) Error(msg string, args ...interface{}) {
+	srv.log.Error(msg, args...)
 }
 
 // Log is a wrapper around log.Logger.
@@ -90,6 +90,6 @@ func (l *Log) createLog(level, msg string, args ...interface{}) {
 	// Flush the tabwriter.
 	w.Flush()
 
-	msg = fmt.Sprintf("[%s] %s%s", level, msg, buf.String())
+	msg = fmt.Sprintf("[%srv] %srv%srv", level, msg, buf.String())
 	l.Println(msg)
 }

@@ -3,44 +3,36 @@ package main
 import (
 	"net/http"
 
+	"github.com/Broderick-Westrope/e-gommerce/cmd/api"
 	"github.com/Broderick-Westrope/e-gommerce/internal/config"
-	"github.com/Broderick-Westrope/e-gommerce/internal/handlers"
 	"github.com/go-chi/chi/v5"
 )
 
 func main() {
 	// TODO: Find a cleaner way to defer the closing of the database connection
 	config := config.New()
-	defer config.Storage.Close()
 
-	router := Routes(config)
+	srv := api.NewServer(config)
+	defer srv.Storage().Close()
 
-	server := &http.Server{
-		Addr:              *config.Addr,
-		ReadHeaderTimeout: *config.ReadHeaderTimeout,
+	router := srv.MountHandlers()
+
+	httpServer := &http.Server{
+		Addr:              config.Addr(),
+		ReadHeaderTimeout: config.ReadHeaderTimeout(),
 		Handler:           router,
 	}
 
 	walkFunc := func(method, route string, handler http.Handler, middleware ...func(http.Handler) http.Handler) error {
-		config.Logger.Info("Route: "+route, "method", method, "middleware", len(middleware))
+		srv.Logger().Info("Route: "+route, "method", method, "middleware", len(middleware))
 		return nil
 	}
 	if err := chi.Walk(router, walkFunc); err != nil {
-		config.Logger.Error(err.Error())
+		srv.Logger().Error(err.Error())
 	}
 
-	config.Logger.Info("Starting server", "addr", *config.Addr)
-	if err := server.ListenAndServe(); err != nil {
-		config.Logger.Error(err.Error())
+	srv.Logger().Info("Starting server", "addr", config.Addr())
+	if err := httpServer.ListenAndServe(); err != nil {
+		srv.Logger().Error(err.Error())
 	}
-}
-
-func Routes(config *config.Config) *chi.Mux {
-	router := chi.NewRouter()
-
-	router.Route("/v1", func(r chi.Router) {
-		r.Mount("/api/products", handlers.ProductRoutes(config))
-	})
-
-	return router
 }
