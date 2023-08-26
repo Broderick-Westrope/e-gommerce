@@ -48,4 +48,13 @@ func (srv *chiServer) MountHandlers() {
 	srv.mux.Route("/v1", func(r chi.Router) {
 		r.Mount("/api/products", ProductRoutes(srv))
 	})
+
+	// Walk the router to see the routes and middleware. Must be done after the routes are mounted.
+	walkFunc := func(method, route string, handler http.Handler, middleware ...func(http.Handler) http.Handler) error {
+		srv.Logger().Info("Route: "+route, "method", method, "middleware", len(middleware))
+		return nil
+	}
+	if err := chi.Walk(srv.Mux(), walkFunc); err != nil {
+		srv.Logger().Error(err.Error())
+	}
 }
