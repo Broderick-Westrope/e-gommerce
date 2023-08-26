@@ -1,9 +1,14 @@
 package api
 
 import (
+	"net/http"
+	"time"
+
 	"github.com/Broderick-Westrope/e-gommerce/internal/config"
 	"github.com/Broderick-Westrope/e-gommerce/internal/storage"
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/httprate"
 )
 
 type Server interface {
@@ -45,6 +50,18 @@ func (srv *chiServer) Logger() config.Logger {
 }
 
 func (srv *chiServer) MountHandlers() {
+	// Routes
+	srv.mux.Use(middleware.Logger)
+	srv.mux.Use(middleware.Heartbeat("/ping"))
+	srv.mux.Use(middleware.AllowContentType("application/json"))
+	srv.mux.Use(middleware.CleanPath)
+	srv.mux.Use(middleware.Recoverer)
+	srv.mux.Use(middleware.RedirectSlashes)
+	srv.mux.Use(httprate.Limit(
+		10,
+		10*time.Minute,
+		httprate.WithKeyFuncs(httprate.KeyByIP, httprate.KeyByEndpoint),
+	))
 	srv.mux.Route("/v1", func(r chi.Router) {
 		r.Mount("/api/products", ProductRoutes(srv))
 	})
