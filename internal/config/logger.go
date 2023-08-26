@@ -90,6 +90,6 @@ func (l *Log) createLog(level, msg string, args ...interface{}) {
 	// Flush the tabwriter.
 	w.Flush()
 
-	msg = fmt.Sprintf("[%srv] %s%s", level, msg, buf.String())
+	msg = fmt.Sprintf("[%s] %s%s", level, msg, buf.String())
 	l.Println(msg)
 }
