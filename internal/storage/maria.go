@@ -36,7 +36,7 @@ func (m Maria) GetProducts() (*[]models.Product, error) {
 
 	for rows.Next() {
 		row := models.Product{}
-		err = rows.Scan(row.ID, row.Name, row.Description, row.Price, row.StockQuantity, row.CreatedAt, row.UpdatedAt)
+		err = rows.Scan(&row.ID, &row.Name, &row.Description, &row.Price, &row.StockQuantity, &row.CreatedAt, &row.UpdatedAt)
 		if err != nil {
 			return nil, err
 		}
@@ -73,4 +73,8 @@ func (m Maria) DeleteProduct(id int) error {
 		return err
 	}
 	return nil
+}
+
+func (m Maria) Close() error {
+	return m.DB.Close()
 }

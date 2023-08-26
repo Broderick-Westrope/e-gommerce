@@ -11,7 +11,7 @@ import (
 func main() {
 	// TODO: Find a cleaner way to defer the closing of the database connection
 	config := config.New()
-	defer config.DB.Close()
+	defer config.Storage.Close()
 
 	router := Routes(config)
 

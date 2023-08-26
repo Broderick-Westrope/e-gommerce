@@ -9,4 +9,5 @@ type Storage interface {
 	CreateProduct(product *models.Product) (int, error)
 	UpdateProduct(product *models.Product) error
 	DeleteProduct(id int) error
+	Close() error
 }
