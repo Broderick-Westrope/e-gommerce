@@ -20,4 +20,4 @@ tasks:
   run:
     desc: "runs the API"
     cmds:
-      - go run .
+      - go run . {{.CLI_ARGS}}
