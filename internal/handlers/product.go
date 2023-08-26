@@ -24,43 +24,19 @@ func ProductRoutes(config *config.Config) *chi.Mux {
 
 func getProducts(config *config.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		rows, err := config.DB.Query("SELECT id, name, created_at FROM products")
+		products, err := config.Storage.GetProducts()
 		if err != nil {
-			config.Logger.Error(err.Error())
-		}
-		defer rows.Close()
-
-		var id int
-		var name, createdAt string
-		response := []map[string]interface{}{}
-		for rows.Next() {
-			err = rows.Scan(&id, &name, &createdAt)
-			if err != nil {
-				config.Logger.Error(err.Error())
-			}
-			response = append(response, map[string]interface{}{
-				"id":         id,
-				"name":       name,
-				"created_at": createdAt,
-			})
-		}
-
-		if err = rows.Err(); err != nil {
 			config.Logger.Error(err.Error())
 		}
 
 		w.Header().Set("Content-Type", "application/json")
 
-		jsonResponse, err := json.Marshal(response)
+		jsonResponse, err := json.Marshal(products)
 		if err != nil {
 			config.Logger.Error(err.Error())
 		}
 
 		if _, err = w.Write(jsonResponse); err != nil {
-			config.Logger.Error(err.Error())
-		}
-
-		if _, err = w.Write([]byte("Get products")); err != nil {
 			config.Logger.Error(err.Error())
 		}
 	}
