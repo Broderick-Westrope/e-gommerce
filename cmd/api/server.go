@@ -6,26 +6,45 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-type Server struct {
+type Server interface {
+	Mux() *chi.Mux
+	Storage() storage.Storage
+	Logger() config.Logger
+	MountHandlers()
+}
+
+type chiServer struct {
 	mux     *chi.Mux
-	Storage storage.Storage
-	Logger  config.Logger
+	storage storage.Storage
+	logger  config.Logger
 }
 
-func NewServer(config config.Config) *Server {
-	return &Server{
-		mux:     chi.NewMux(),
-		Storage: config.Storage(),
-		Logger:  config.Logger(),
+// NewServer is a factory function that returns a Server interface based on the mode passed in. The Server is initialized with the config passed in.
+func NewServer(mode string, config config.Config) Server {
+	if mode == "chi" {
+		return &chiServer{
+			mux:     chi.NewMux(),
+			storage: config.Storage(),
+			logger:  config.Logger(),
+		}
 	}
+	return nil
 }
 
-func (srv *Server) GetMux() *chi.Mux {
+func (srv *chiServer) Mux() *chi.Mux {
 	return srv.mux
 }
 
-func (srv *Server) MountHandlers() {
+func (srv *chiServer) Storage() storage.Storage {
+	return srv.storage
+}
+
+func (srv *chiServer) Logger() config.Logger {
+	return srv.logger
+}
+
+func (srv *chiServer) MountHandlers() {
 	srv.mux.Route("/v1", func(r chi.Router) {
-		r.Mount("/api/products", srv.ProductRoutes())
+		r.Mount("/api/products", ProductRoutes(srv))
 	})
 }
