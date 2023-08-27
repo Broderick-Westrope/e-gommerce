@@ -2,7 +2,6 @@ package api
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -112,12 +111,16 @@ func deleteProductByID(srv Server) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.Atoi(chi.URLParam(r, "id"))
 		if err != nil {
-			srv.Logger().Error(err.Error())
+			respondWithError(w, srv.Logger(), http.StatusBadRequest, "Invalid parameter 'id'")
+			return
 		}
-		msg := fmt.Sprintf("Delete product %d", id)
-		_, err = w.Write([]byte(msg))
+
+		err = srv.Storage().DeleteProduct(id)
 		if err != nil {
-			srv.Logger().Error(err.Error())
+			respondWithError(w, srv.Logger(), http.StatusInternalServerError, "Failed to delete product: "+err.Error())
+			return
 		}
+
+		respondWithJSON(w, srv.Logger(), http.StatusNoContent, map[string]int{"id": id})
 	}
 }
