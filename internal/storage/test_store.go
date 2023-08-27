@@ -22,7 +22,7 @@ func (t *TestStore) GetProduct(id int) (*models.Product, error) {
 			return &product, nil
 		}
 	}
-	return nil, fmt.Errorf("product with id %d not found", id)
+	return nil, &NotFoundError{fmt.Sprintf("Product with ID %d not found", id)}
 }
 
 func (t *TestStore) GetProducts() (*[]models.Product, error) {
