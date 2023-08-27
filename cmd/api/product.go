@@ -14,10 +14,10 @@ func ProductRoutes(srv Server) *chi.Mux {
 	router := chi.NewRouter()
 
 	router.Get("/", getProducts(srv))
-	router.Get("/{id}", getProductByID(srv))
-	router.Post("/{id}", createProduct(srv))
-	router.Put("/{id}", updateProductByID(srv))
-	router.Delete("/{id}", deleteProductByID(srv))
+	router.Get("/{id}", getProduct(srv))
+	router.Post("/", createProduct(srv))
+	router.Put("/{id}", updateProduct(srv))
+	router.Delete("/{id}", deleteProduct(srv))
 
 	return router
 }
@@ -34,7 +34,7 @@ func getProducts(srv Server) http.HandlerFunc {
 	}
 }
 
-func getProductByID(srv Server) http.HandlerFunc {
+func getProduct(srv Server) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.Atoi(chi.URLParam(r, "id"))
 		if err != nil {
@@ -59,20 +59,15 @@ func getProductByID(srv Server) http.HandlerFunc {
 
 func createProduct(srv Server) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		id, err := strconv.Atoi(chi.URLParam(r, "id"))
-		if err != nil {
-			respondWithError(w, srv.Logger(), http.StatusBadRequest, "Invalid parameter 'id'")
-			return
-		}
-
-		var product models.Product
-		err = parseJSONBody(r, &product)
+		var createProductReq models.CreateProductRequest
+		err := parseJSONBody(r, &createProductReq)
 		if err != nil {
 			respondWithError(w, srv.Logger(), http.StatusInternalServerError, "Failed to parse JSON payload: "+err.Error())
 			return
 		}
 
-		_, err = srv.Storage().CreateProduct(&product)
+		var id int
+		id, err = srv.Storage().CreateProduct(&createProductReq)
 		if err != nil {
 			respondWithError(w, srv.Logger(), http.StatusInternalServerError, "Failed to create product: "+err.Error())
 			return
@@ -82,7 +77,7 @@ func createProduct(srv Server) http.HandlerFunc {
 	}
 }
 
-func updateProductByID(srv Server) http.HandlerFunc {
+func updateProduct(srv Server) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.Atoi(chi.URLParam(r, "id"))
 		if err != nil {
@@ -90,14 +85,15 @@ func updateProductByID(srv Server) http.HandlerFunc {
 			return
 		}
 
-		var product models.Product
-		err = parseJSONBody(r, &product)
+		var createProductReq models.CreateProductRequest
+		err = parseJSONBody(r, &createProductReq)
 		if err != nil {
 			respondWithError(w, srv.Logger(), http.StatusInternalServerError, "Failed to parse JSON payload: "+err.Error())
 			return
 		}
 
-		err = srv.Storage().UpdateProduct(&product)
+		product := createProductReq.ToProduct(id)
+		err = srv.Storage().UpdateProduct(product)
 		if err != nil {
 			respondWithError(w, srv.Logger(), http.StatusInternalServerError, "Failed to update product: "+err.Error())
 			return
@@ -107,7 +103,7 @@ func updateProductByID(srv Server) http.HandlerFunc {
 	}
 }
 
-func deleteProductByID(srv Server) http.HandlerFunc {
+func deleteProduct(srv Server) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.Atoi(chi.URLParam(r, "id"))
 		if err != nil {
