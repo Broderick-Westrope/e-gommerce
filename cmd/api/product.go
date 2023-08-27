@@ -87,13 +87,24 @@ func updateProductByID(srv Server) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.Atoi(chi.URLParam(r, "id"))
 		if err != nil {
-			srv.Logger().Error(err.Error())
+			respondWithError(w, srv.Logger(), http.StatusBadRequest, "Invalid parameter 'id'")
+			return
 		}
-		msg := fmt.Sprintf("Update product %d", id)
-		_, err = w.Write([]byte(msg))
+
+		var product models.Product
+		err = parseJSONBody(r, &product)
 		if err != nil {
-			srv.Logger().Error(err.Error())
+			respondWithError(w, srv.Logger(), http.StatusInternalServerError, "Failed to parse JSON payload: "+err.Error())
+			return
 		}
+
+		err = srv.Storage().UpdateProduct(&product)
+		if err != nil {
+			respondWithError(w, srv.Logger(), http.StatusInternalServerError, "Failed to update product: "+err.Error())
+			return
+		}
+
+		respondWithJSON(w, srv.Logger(), http.StatusNoContent, map[string]int{"id": id})
 	}
 }
 
