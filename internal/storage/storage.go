@@ -6,7 +6,7 @@ import "github.com/Broderick-Westrope/e-gommerce/internal/models"
 type Storage interface {
 	GetProduct(id int) (*models.Product, error)
 	GetProducts() (*[]models.Product, error)
-	CreateProduct(product *models.Product) (int, error)
+	CreateProduct(product *models.CreateProductRequest) (int, error)
 	UpdateProduct(product *models.Product) error
 	DeleteProduct(id int) error
 	Close() error

@@ -29,10 +29,12 @@ func (t *TestStore) GetProducts() (*[]models.Product, error) {
 	return t.Products, nil
 }
 
-func (t *TestStore) CreateProduct(product *models.Product) (int, error) {
-	p := append(*t.Products, *product)
-	t.Products = &p
-	return product.ID, nil
+func (t *TestStore) CreateProduct(product *models.CreateProductRequest) (int, error) {
+	p := product.ToProduct(len(*t.Products) + 1)
+	p.ID = len(*t.Products) + 1
+	products := append(*t.Products, *p)
+	t.Products = &products
+	return p.ID, nil
 }
 
 func (t *TestStore) UpdateProduct(product *models.Product) error {

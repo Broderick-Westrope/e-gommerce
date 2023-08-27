@@ -61,7 +61,7 @@ func (m Maria) GetProducts() (*[]models.Product, error) {
 	return result, nil
 }
 
-func (m Maria) CreateProduct(product *models.Product) (int, error) {
+func (m Maria) CreateProduct(product *models.CreateProductRequest) (int, error) {
 	query := `
 	INSERT INTO products (name, description, price, stock_quantity)
 	VALUES (?, ?, ?, ?)`
