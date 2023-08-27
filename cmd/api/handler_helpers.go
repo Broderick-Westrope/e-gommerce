@@ -14,6 +14,11 @@ import (
 func respondWithJSON(w http.ResponseWriter, logger config.Logger, statusCode int, payload interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 
+	if payload == nil {
+		w.WriteHeader(statusCode)
+		return
+	}
+
 	var buf bytes.Buffer
 	err := json.NewEncoder(&buf).Encode(payload)
 	if err != nil {
