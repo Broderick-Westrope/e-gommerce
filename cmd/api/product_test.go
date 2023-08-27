@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"reflect"
+	"strconv"
 	"testing"
 
 	"github.com/Broderick-Westrope/e-gommerce/internal/models"
@@ -218,6 +219,94 @@ func TestServer_ProductRoutes_CreateProduct(t *testing.T) {
 			if id.ID != tc.expectedId {
 				t.Errorf("Id: got %d; want %d", id, tc.expectedId)
 			}
+		})
+	}
+}
+
+func TestServer_ProductRoutes_UpdateProduct(t *testing.T) {
+	method := http.MethodPut
+	url := "/v1/api/products/"
+
+	srv := newTestServer()
+	srv.MountHandlers()
+
+	type idResponse struct {
+		ID int `json:"id"`
+	}
+
+	tt := []struct {
+		name               string
+		id                 string
+		existingProduct    models.CreateProductRequest
+		updatedProduct     models.CreateProductRequest
+		expectedStatusCode int
+	}{
+		{
+			"happy path", fmt.Sprint(1),
+			models.CreateProductRequest{
+				Name:          "Test Product",
+				Description:   "Test Description",
+				StockQuantity: 10,
+				Price:         1.99,
+			},
+			models.CreateProductRequest{
+				Name:          "Test Product 2",
+				Description:   "Test Description 2",
+				StockQuantity: 20,
+			},
+			http.StatusNoContent,
+		},
+		{
+			"bad id param", "not-an-id",
+			models.CreateProductRequest{
+				Name:          "Test Product",
+				Description:   "Test Description",
+				StockQuantity: 10,
+				Price:         1.99,
+			},
+			models.CreateProductRequest{
+				Name:          "Test Product 2",
+				Description:   "Test Description 2",
+				StockQuantity: 20,
+			},
+			http.StatusBadRequest,
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.name, func(t *testing.T) {
+			productId, err := srv.Storage().CreateProduct(&tc.existingProduct)
+			if err != nil {
+				t.Error(fmt.Errorf("Error creating product: %w", err))
+			}
+
+			rr := httptest.NewRecorder()
+			body := new(bytes.Buffer)
+			json.NewEncoder(body).Encode(tc.updatedProduct)
+			req, err := http.NewRequest(method, fmt.Sprint(url, tc.id), body)
+			if err != nil {
+				t.Error(err)
+			}
+
+			srv.Mux().ServeHTTP(rr, req)
+
+			if rr.Code != tc.expectedStatusCode {
+				t.Errorf("Status Code: got %d; want %d", rr.Code, tc.expectedStatusCode)
+			}
+
+			if rr.Code == http.StatusNoContent {
+				id := new(idResponse)
+				json.NewDecoder(rr.Body).Decode(&id)
+
+				intId, _ := strconv.Atoi(tc.id)
+				if id.ID != intId {
+					t.Errorf("Id (case 1): got %d; want %s", id, tc.id)
+				} else if id.ID != productId {
+					t.Errorf("Id (case 2): got %d; want %d", id, productId)
+				}
+			}
+
+			srv.Storage().DeleteProduct(productId)
 		})
 	}
 }
