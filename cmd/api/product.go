@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -53,8 +54,9 @@ func getProductByID(srv Server) http.HandlerFunc {
 
 		products, err := srv.Storage().GetProduct(id)
 		if err != nil {
-			if _, ok := err.(*storage.ErrNotFound); ok {
-				w.WriteHeader(http.StatusNotFound)
+			var target *storage.NotFoundError
+			if errors.As(err, &target) {
+				http.Error(w, "Product not found", http.StatusNotFound)
 				return
 			}
 			srv.Logger().Error(err.Error())
