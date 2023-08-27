@@ -1,6 +1,7 @@
 package api_test
 
 import (
+	"bytes"
 	"database/sql"
 	"encoding/json"
 	"fmt"
@@ -160,6 +161,62 @@ func TestServer_ProductRoutes_GetProduct(t *testing.T) {
 
 			if !reflect.DeepEqual(*product, tc.expectedProduct) {
 				t.Errorf("Product: got '%v'; want '%v'", *product, tc.expectedProduct)
+			}
+		})
+	}
+}
+
+func TestServer_ProductRoutes_CreateProduct(t *testing.T) {
+	method := http.MethodPost
+	url := "/v1/api/products/"
+
+	srv := newTestServer()
+	srv.MountHandlers()
+
+	type idResponse struct {
+		ID int `json:"id"`
+	}
+
+	tt := []struct {
+		name               string
+		createProductReq   models.CreateProductRequest
+		expectedStatusCode int
+		expectedId         int
+	}{
+		{
+			"happy path",
+			models.CreateProductRequest{
+				Name:          "Test Product",
+				Description:   "Test Description",
+				StockQuantity: 10,
+				Price:         1.99,
+			},
+			http.StatusCreated,
+			1,
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.name, func(t *testing.T) {
+			rr := httptest.NewRecorder()
+			body := new(bytes.Buffer)
+			json.NewEncoder(body).Encode(tc.createProductReq)
+			req, err := http.NewRequest(method, url, body)
+			if err != nil {
+				t.Error(err)
+			}
+
+			srv.Mux().ServeHTTP(rr, req)
+
+			if rr.Code != tc.expectedStatusCode {
+				t.Errorf("Status Code: got %d; want %d", rr.Code, tc.expectedStatusCode)
+			}
+
+			id := new(idResponse)
+			json.NewDecoder(rr.Body).Decode(&id)
+
+			if id.ID != tc.expectedId {
+				t.Errorf("Id: got %d; want %d", id, tc.expectedId)
 			}
 		})
 	}
