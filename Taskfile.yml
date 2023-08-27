@@ -20,3 +20,9 @@ tasks:
     desc: "runs the API"
     cmds:
       - go run . {{.CLI_ARGS}}
+  pcc:
+    desc: "runs several pre-commit checks"
+    cmds:
+      - task: build
+      - task: test
+      - task: lint
