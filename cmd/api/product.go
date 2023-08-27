@@ -1,7 +1,6 @@
 package api
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -39,32 +38,22 @@ func getProductByID(srv Server) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.Atoi(chi.URLParam(r, "id"))
 		if err != nil {
-			srv.Logger().Error(err.Error())
-			w.Header().Add("Content-Type", "text/plain")
-			http.Error(w, "Invalid ID parameter", http.StatusBadRequest)
+			respondWithError(w, srv.Logger(), http.StatusBadRequest, "Invalid parameter 'id'")
+			return
 		}
 
-		products, err := srv.Storage().GetProduct(id)
+		product, err := srv.Storage().GetProduct(id)
 		if err != nil {
 			var target *storage.NotFoundError
 			if errors.As(err, &target) {
-				http.Error(w, "Product not found", http.StatusNotFound)
+				respondWithError(w, srv.Logger(), http.StatusNotFound, "Product not found")
 				return
 			}
-			srv.Logger().Error(err.Error())
-			// TODO: Respond to user with error, this may be sql row not found
+			respondWithError(w, srv.Logger(), http.StatusInternalServerError, err.Error())
+			return
 		}
 
-		w.Header().Set("Content-Type", "application/json")
-
-		jsonResponse, err := json.Marshal(products)
-		if err != nil {
-			srv.Logger().Error(err.Error())
-		}
-
-		if _, err = w.Write(jsonResponse); err != nil {
-			srv.Logger().Error(err.Error())
-		}
+		respondWithJSON(w, srv.Logger(), http.StatusOK, product)
 	}
 }
 
