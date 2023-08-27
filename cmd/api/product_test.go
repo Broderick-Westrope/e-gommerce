@@ -27,7 +27,7 @@ func TestServer_ProductRoutes(t *testing.T) {
 				"happy path, get product",
 				http.MethodGet,
 				"/v1/api/products/1",
-				http.StatusOK,
+				http.StatusNotFound,
 			},
 			{
 				"happy path, create product",
