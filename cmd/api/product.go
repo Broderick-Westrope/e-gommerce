@@ -49,7 +49,7 @@ func getProductByID(srv Server) http.HandlerFunc {
 				respondWithError(w, srv.Logger(), http.StatusNotFound, "Product not found")
 				return
 			}
-			respondWithError(w, srv.Logger(), http.StatusInternalServerError, err.Error())
+			respondWithError(w, srv.Logger(), http.StatusInternalServerError, "Failed to get product: "+err.Error())
 			return
 		}
 
