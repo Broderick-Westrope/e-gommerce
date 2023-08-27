@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/Broderick-Westrope/e-gommerce/internal/models"
 	"github.com/Broderick-Westrope/e-gommerce/internal/storage"
 	"github.com/go-chi/chi/v5"
 )
@@ -61,14 +62,24 @@ func createProduct(srv Server) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.Atoi(chi.URLParam(r, "id"))
 		if err != nil {
-			srv.Logger().Error(err.Error())
+			respondWithError(w, srv.Logger(), http.StatusBadRequest, "Invalid parameter 'id'")
+			return
 		}
-		w.WriteHeader(http.StatusCreated)
-		msg := fmt.Sprintf("Create product %d", id)
-		_, err = w.Write([]byte(msg))
+
+		var product models.Product
+		err = parseJSONBody(r, &product)
 		if err != nil {
-			srv.Logger().Error(err.Error())
+			respondWithError(w, srv.Logger(), http.StatusInternalServerError, "Failed to parse JSON payload: "+err.Error())
+			return
 		}
+
+		_, err = srv.Storage().CreateProduct(&product)
+		if err != nil {
+			respondWithError(w, srv.Logger(), http.StatusInternalServerError, "Failed to create product: "+err.Error())
+			return
+		}
+
+		respondWithJSON(w, srv.Logger(), http.StatusCreated, map[string]int{"id": id})
 	}
 }
 
