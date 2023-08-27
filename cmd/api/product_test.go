@@ -65,7 +65,10 @@ func TestServer_ProductRoutes_GetProducts(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
 			for _, productReq := range tc.products {
-				srv.Storage().CreateProduct(&productReq)
+				_, err := srv.Storage().CreateProduct(&productReq)
+				if err != nil {
+					t.Error(fmt.Errorf("Error creating product: %w", err))
+				}
 			}
 
 			rr := httptest.NewRecorder()
@@ -81,7 +84,10 @@ func TestServer_ProductRoutes_GetProducts(t *testing.T) {
 			}
 
 			products := new([]models.Product)
-			json.NewDecoder(rr.Body).Decode(products)
+			err = json.NewDecoder(rr.Body).Decode(products)
+			if err != nil {
+				t.Error(fmt.Errorf("Error decoding JSON response: %w", err))
+			}
 
 			if len(*products) != len(tc.expectedProducts) {
 				t.Errorf("Products Length: got %d; want %d", len(*products), len(tc.expectedProducts))
@@ -91,7 +97,10 @@ func TestServer_ProductRoutes_GetProducts(t *testing.T) {
 			}
 
 			for _, product := range *products {
-				srv.Storage().DeleteProduct(product.ID)
+				err = srv.Storage().DeleteProduct(product.ID)
+				if err != nil {
+					t.Error(fmt.Errorf("Error deleting product: %w", err))
+				}
 			}
 		})
 	}
@@ -103,7 +112,7 @@ func TestServer_ProductRoutes_GetProduct(t *testing.T) {
 
 	srv := newTestServer()
 	srv.MountHandlers()
-	productId, err := srv.Storage().CreateProduct(&models.CreateProductRequest{
+	productID, err := srv.Storage().CreateProduct(&models.CreateProductRequest{
 		Name:          "Test Product",
 		Description:   "Test Description",
 		StockQuantity: 10,
@@ -120,7 +129,7 @@ func TestServer_ProductRoutes_GetProduct(t *testing.T) {
 		expectedProduct    models.Product
 	}{
 		{
-			"happy path", fmt.Sprint(productId),
+			"happy path", fmt.Sprint(productID),
 			http.StatusOK,
 			models.Product{
 				ID:            1,
@@ -131,7 +140,7 @@ func TestServer_ProductRoutes_GetProduct(t *testing.T) {
 			},
 		},
 		{
-			"404 not found", fmt.Sprint(productId + 1),
+			"404 not found", fmt.Sprint(productID + 1),
 			http.StatusNotFound,
 			models.Product{},
 		},
@@ -145,7 +154,8 @@ func TestServer_ProductRoutes_GetProduct(t *testing.T) {
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
 			rr := httptest.NewRecorder()
-			req, err := http.NewRequest(method, fmt.Sprint(url, tc.id), nil)
+			var req *http.Request
+			req, err = http.NewRequest(method, fmt.Sprint(url, tc.id), nil)
 			if err != nil {
 				t.Error(err)
 			}
@@ -157,7 +167,10 @@ func TestServer_ProductRoutes_GetProduct(t *testing.T) {
 			}
 
 			product := new(models.Product)
-			json.NewDecoder(rr.Body).Decode(product)
+			err = json.NewDecoder(rr.Body).Decode(product)
+			if err != nil {
+				t.Error(fmt.Errorf("Error decoding JSON response: %w", err))
+			}
 
 			if !reflect.DeepEqual(*product, tc.expectedProduct) {
 				t.Errorf("Product: got '%v'; want '%v'", *product, tc.expectedProduct)
@@ -181,7 +194,7 @@ func TestServer_ProductRoutes_CreateProduct(t *testing.T) {
 		name               string
 		createProductReq   models.CreateProductRequest
 		expectedStatusCode int
-		expectedId         int
+		expectedID         int
 	}{
 		{
 			"happy path",
@@ -200,7 +213,11 @@ func TestServer_ProductRoutes_CreateProduct(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			rr := httptest.NewRecorder()
 			body := new(bytes.Buffer)
-			json.NewEncoder(body).Encode(tc.createProductReq)
+			err := json.NewEncoder(body).Encode(tc.createProductReq)
+			if err != nil {
+				t.Error(fmt.Errorf("Error encoding JSON payload: %w", err))
+			}
+
 			req, err := http.NewRequest(method, url, body)
 			if err != nil {
 				t.Error(err)
@@ -213,10 +230,13 @@ func TestServer_ProductRoutes_CreateProduct(t *testing.T) {
 			}
 
 			id := new(idResponse)
-			json.NewDecoder(rr.Body).Decode(&id)
+			err = json.NewDecoder(rr.Body).Decode(&id)
+			if err != nil {
+				t.Error(fmt.Errorf("Error decoding JSON response: %w", err))
+			}
 
-			if id.ID != tc.expectedId {
-				t.Errorf("Id: got %d; want %d", id, tc.expectedId)
+			if id.ID != tc.expectedID {
+				t.Errorf("Id: got %d; want %d", id, tc.expectedID)
 			}
 		})
 	}
@@ -270,14 +290,18 @@ func TestServer_ProductRoutes_UpdateProduct(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
-			productId, err := srv.Storage().CreateProduct(&tc.existingProduct)
+			productID, err := srv.Storage().CreateProduct(&tc.existingProduct)
 			if err != nil {
 				t.Error(fmt.Errorf("Error creating product: %w", err))
 			}
 
 			rr := httptest.NewRecorder()
 			body := new(bytes.Buffer)
-			json.NewEncoder(body).Encode(tc.updatedProduct)
+			err = json.NewEncoder(body).Encode(tc.updatedProduct)
+			if err != nil {
+				t.Error(fmt.Errorf("Error encoding JSON payload: %w", err))
+			}
+
 			req, err := http.NewRequest(method, fmt.Sprint(url, tc.id), body)
 			if err != nil {
 				t.Error(err)
@@ -289,7 +313,10 @@ func TestServer_ProductRoutes_UpdateProduct(t *testing.T) {
 				t.Errorf("Status Code: got %d; want %d", rr.Code, tc.expectedStatusCode)
 			}
 
-			srv.Storage().DeleteProduct(productId)
+			err = srv.Storage().DeleteProduct(productID)
+			if err != nil {
+				t.Error(fmt.Errorf("Error deleting product: %w", err))
+			}
 		})
 	}
 }
@@ -326,7 +353,7 @@ func TestServer_ProductRoutes_DeleteProduct(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
-			productId, err := srv.Storage().CreateProduct(&models.CreateProductRequest{
+			productID, err := srv.Storage().CreateProduct(&models.CreateProductRequest{
 				Name:          "Test Product",
 				Description:   "Test Description",
 				StockQuantity: 10,
@@ -349,7 +376,7 @@ func TestServer_ProductRoutes_DeleteProduct(t *testing.T) {
 			}
 
 			if rr.Code == http.StatusNoContent {
-				_, err := srv.Storage().GetProduct(productId)
+				_, err = srv.Storage().GetProduct(productID)
 				if err == nil {
 					t.Errorf("Product not deleted")
 				}
