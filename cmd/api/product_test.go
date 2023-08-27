@@ -3,6 +3,7 @@ package api_test
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
@@ -18,81 +19,148 @@ func TestServer_ProductRoutes_GetProducts(t *testing.T) {
 	srv := newTestServer()
 	srv.MountHandlers()
 
-	t.Run("product routes", func(t *testing.T) {
-		tt := []struct {
-			name               string
-			products           []models.CreateProductRequest
-			expectedStatusCode int
-			expectedProducts   []models.Product
-		}{
-			{
-				"happy path",
-				[]models.CreateProductRequest{
-					{
-						Name:          "Test Product",
-						Description:   "Test Description",
-						StockQuantity: 10,
-						Price:         1.99,
-					},
-					{
-						Name:          "Test Product 2",
-						Description:   "",
-						StockQuantity: 20,
-						Price:         2.99,
-					},
+	tt := []struct {
+		name               string
+		products           []models.CreateProductRequest
+		expectedStatusCode int
+		expectedProducts   []models.Product
+	}{
+		{
+			"happy path",
+			[]models.CreateProductRequest{
+				{
+					Name:          "Test Product",
+					Description:   "Test Description",
+					StockQuantity: 10,
+					Price:         1.99,
 				},
-				http.StatusOK,
-				[]models.Product{
-					{
-						ID:            1,
-						Name:          "Test Product",
-						Description:   sql.NullString{String: "Test Description", Valid: true},
-						StockQuantity: 10,
-						Price:         1.99,
-					},
-					{
-						ID:            2,
-						Name:          "Test Product 2",
-						Description:   sql.NullString{String: "", Valid: false},
-						StockQuantity: 20,
-						Price:         2.99,
-					},
+				{
+					Name:          "Test Product 2",
+					Description:   "",
+					StockQuantity: 20,
+					Price:         2.99,
 				},
 			},
-		}
+			http.StatusOK,
+			[]models.Product{
+				{
+					ID:            1,
+					Name:          "Test Product",
+					Description:   sql.NullString{String: "Test Description", Valid: true},
+					StockQuantity: 10,
+					Price:         1.99,
+				},
+				{
+					ID:            2,
+					Name:          "Test Product 2",
+					Description:   sql.NullString{String: "", Valid: false},
+					StockQuantity: 20,
+					Price:         2.99,
+				},
+			},
+		},
+	}
 
-		for _, tc := range tt {
-			t.Run(tc.name, func(t *testing.T) {
-				for _, productReq := range tc.products {
-					srv.Storage().CreateProduct(&productReq)
-				}
+	for _, tc := range tt {
+		t.Run(tc.name, func(t *testing.T) {
+			for _, productReq := range tc.products {
+				srv.Storage().CreateProduct(&productReq)
+			}
 
-				rr := httptest.NewRecorder()
-				req, err := http.NewRequest(method, url, nil)
-				if err != nil {
-					t.Error(err)
-				}
+			rr := httptest.NewRecorder()
+			req, err := http.NewRequest(method, url, nil)
+			if err != nil {
+				t.Error(err)
+			}
 
-				srv.Mux().ServeHTTP(rr, req)
+			srv.Mux().ServeHTTP(rr, req)
 
-				if rr.Code != tc.expectedStatusCode {
-					t.Errorf("Status Code: got %d; want %d", rr.Code, tc.expectedStatusCode)
-				}
+			if rr.Code != tc.expectedStatusCode {
+				t.Errorf("Status Code: got %d; want %d", rr.Code, tc.expectedStatusCode)
+			}
 
-				products := new([]models.Product)
-				json.NewDecoder(rr.Body).Decode(products)
+			products := new([]models.Product)
+			json.NewDecoder(rr.Body).Decode(products)
 
-				if len(*products) != len(tc.expectedProducts) {
-					t.Errorf("Products Length: got %d; want %d", len(*products), len(tc.expectedProducts))
-				}
-				if !reflect.DeepEqual(*products, tc.expectedProducts) {
-					t.Errorf("Products: got %v; want %v", *products, tc.expectedProducts)
-				}
+			if len(*products) != len(tc.expectedProducts) {
+				t.Errorf("Products Length: got %d; want %d", len(*products), len(tc.expectedProducts))
+			}
+			if !reflect.DeepEqual(*products, tc.expectedProducts) {
+				t.Errorf("Products: got %v; want %v", *products, tc.expectedProducts)
+			}
 
-				for _, product := range *products {
-					srv.Storage().DeleteProduct(product.ID)
-				}
-			})
-		}
+			for _, product := range *products {
+				srv.Storage().DeleteProduct(product.ID)
+			}
+		})
+	}
+}
+
+func TestServer_ProductRoutes_GetProduct(t *testing.T) {
+	method := http.MethodGet
+	url := "/v1/api/products/"
+
+	srv := newTestServer()
+	srv.MountHandlers()
+	productId, err := srv.Storage().CreateProduct(&models.CreateProductRequest{
+		Name:          "Test Product",
+		Description:   "Test Description",
+		StockQuantity: 10,
+		Price:         1.99,
 	})
+	if err != nil {
+		t.Error(fmt.Errorf("Error creating product: %w", err))
+	}
+
+	tt := []struct {
+		name               string
+		id                 string
+		expectedStatusCode int
+		expectedProduct    models.Product
+	}{
+		{
+			"happy path", fmt.Sprint(productId),
+			http.StatusOK,
+			models.Product{
+				ID:            1,
+				Name:          "Test Product",
+				Description:   sql.NullString{String: "Test Description", Valid: true},
+				StockQuantity: 10,
+				Price:         1.99,
+			},
+		},
+		{
+			"404 not found", fmt.Sprint(productId + 1),
+			http.StatusNotFound,
+			models.Product{},
+		},
+		{
+			"bad id param", "not-an-id",
+			http.StatusBadRequest,
+			models.Product{},
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.name, func(t *testing.T) {
+			rr := httptest.NewRecorder()
+			req, err := http.NewRequest(method, fmt.Sprint(url, tc.id), nil)
+			if err != nil {
+				t.Error(err)
+			}
+
+			srv.Mux().ServeHTTP(rr, req)
+
+			if rr.Code != tc.expectedStatusCode {
+				t.Errorf("Status Code: got %d; want %d", rr.Code, tc.expectedStatusCode)
+			}
+
+			product := new(models.Product)
+			json.NewDecoder(rr.Body).Decode(product)
+
+			if !reflect.DeepEqual(*product, tc.expectedProduct) {
+				t.Errorf("Product: got '%v'; want '%v'", *product, tc.expectedProduct)
+			}
+		})
+	}
 }
