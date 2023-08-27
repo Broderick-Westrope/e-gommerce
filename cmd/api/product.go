@@ -117,6 +117,6 @@ func deleteProduct(srv Server) http.HandlerFunc {
 			return
 		}
 
-		respondWithJSON(w, srv.Logger(), http.StatusNoContent, map[string]int{"id": id})
+		respondWithJSON(w, srv.Logger(), http.StatusNoContent, nil)
 	}
 }

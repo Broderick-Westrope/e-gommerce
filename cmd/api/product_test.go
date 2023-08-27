@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"reflect"
-	"strconv"
 	"testing"
 
 	"github.com/Broderick-Westrope/e-gommerce/internal/models"
@@ -230,10 +229,6 @@ func TestServer_ProductRoutes_UpdateProduct(t *testing.T) {
 	srv := newTestServer()
 	srv.MountHandlers()
 
-	type idResponse struct {
-		ID int `json:"id"`
-	}
-
 	tt := []struct {
 		name               string
 		id                 string
@@ -294,19 +289,71 @@ func TestServer_ProductRoutes_UpdateProduct(t *testing.T) {
 				t.Errorf("Status Code: got %d; want %d", rr.Code, tc.expectedStatusCode)
 			}
 
-			if rr.Code == http.StatusNoContent {
-				id := new(idResponse)
-				json.NewDecoder(rr.Body).Decode(&id)
+			srv.Storage().DeleteProduct(productId)
+		})
+	}
+}
 
-				intId, _ := strconv.Atoi(tc.id)
-				if id.ID != intId {
-					t.Errorf("Id (case 1): got %d; want %s", id, tc.id)
-				} else if id.ID != productId {
-					t.Errorf("Id (case 2): got %d; want %d", id, productId)
-				}
+func TestServer_ProductRoutes_DeleteProduct(t *testing.T) {
+	method := http.MethodDelete
+	url := "/v1/api/products/"
+
+	srv := newTestServer()
+	srv.MountHandlers()
+
+	tt := []struct {
+		name               string
+		id                 string
+		existingProduct    models.CreateProductRequest
+		expectedStatusCode int
+	}{
+		{
+			"happy path", fmt.Sprint(1),
+			models.CreateProductRequest{
+				Name:          "Test Product",
+				Description:   "Test Description",
+				StockQuantity: 10,
+				Price:         1.99,
+			},
+			http.StatusNoContent,
+		},
+		{
+			"bad id param", "not-an-id",
+			models.CreateProductRequest{},
+			http.StatusBadRequest,
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.name, func(t *testing.T) {
+			productId, err := srv.Storage().CreateProduct(&models.CreateProductRequest{
+				Name:          "Test Product",
+				Description:   "Test Description",
+				StockQuantity: 10,
+				Price:         1.99,
+			})
+			if err != nil {
+				t.Error(fmt.Errorf("Error creating product: %w", err))
 			}
 
-			srv.Storage().DeleteProduct(productId)
+			rr := httptest.NewRecorder()
+			req, err := http.NewRequest(method, fmt.Sprint(url, tc.id), nil)
+			if err != nil {
+				t.Error(err)
+			}
+
+			srv.Mux().ServeHTTP(rr, req)
+
+			if rr.Code != tc.expectedStatusCode {
+				t.Errorf("Status Code: got %d; want %d", rr.Code, tc.expectedStatusCode)
+			}
+
+			if rr.Code == http.StatusNoContent {
+				_, err := srv.Storage().GetProduct(productId)
+				if err == nil {
+					t.Errorf("Product not deleted")
+				}
+			}
 		})
 	}
 }
