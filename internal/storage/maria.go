@@ -28,7 +28,7 @@ func (m Maria) GetProduct(id int) (*models.Product, error) {
 	err := row.Scan(result.ID, result.Name, result.Description, result.Price, result.StockQuantity)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, &ErrNotFound{Operation: fmt.Sprintf("Maria.GetProduct(%d)", id)}
+			return nil, &NotFoundError{Operation: fmt.Sprintf("Maria.GetProduct(%d)", id)}
 		}
 		return nil, err
 	}
