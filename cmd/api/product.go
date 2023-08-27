@@ -27,19 +27,11 @@ func getProducts(srv Server) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		products, err := srv.Storage().GetProducts()
 		if err != nil {
-			srv.Logger().Error(err.Error())
+			respondWithError(w, srv.Logger(), http.StatusInternalServerError, err.Error())
+			return
 		}
 
-		w.Header().Set("Content-Type", "application/json")
-
-		jsonResponse, err := json.Marshal(products)
-		if err != nil {
-			srv.Logger().Error(err.Error())
-		}
-
-		if _, err = w.Write(jsonResponse); err != nil {
-			srv.Logger().Error(err.Error())
-		}
+		respondWithJSON(w, srv.Logger(), http.StatusOK, products)
 	}
 }
 
