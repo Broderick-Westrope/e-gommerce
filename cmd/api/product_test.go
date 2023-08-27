@@ -39,13 +39,13 @@ func TestServer_ProductRoutes(t *testing.T) {
 				"happy path, update product",
 				http.MethodPut,
 				"/v1/api/products/1",
-				http.StatusOK,
+				http.StatusNoContent,
 			},
 			{
 				"happy path, delete product",
 				http.MethodDelete,
 				"/v1/api/products/1",
-				http.StatusOK,
+				http.StatusNoContent,
 			},
 		}
 
