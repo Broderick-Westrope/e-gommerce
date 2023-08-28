@@ -1,6 +1,7 @@
 package api
 
 import (
+	_ "database/sql"
 	"errors"
 	"net/http"
 	"strconv"
@@ -22,6 +23,14 @@ func ProductRoutes(srv Server) *chi.Mux {
 	return router
 }
 
+// @Summary		Get all products
+// @Description	Retrieves all products.
+// @ID				get-products
+// @Tags			products
+// @Produce		json
+// @Success		200	{array}		models.Product
+// @Failure		500	{string}	string	"Internal Server Error"
+// @Router			/products [get]
 func getProducts(srv Server) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		products, err := srv.Storage().GetProducts()

@@ -1,0 +1,59 @@
+basePath: /v1/api
+definitions:
+  models.Product:
+    properties:
+      description:
+        $ref: '#/definitions/sql.NullString'
+      id:
+        type: integer
+      name:
+        type: string
+      price:
+        type: number
+      stock_quantity:
+        type: integer
+    type: object
+  sql.NullString:
+    properties:
+      string:
+        type: string
+      valid:
+        description: Valid is true if String is not NULL
+        type: boolean
+    type: object
+externalDocs:
+  description: GitHub repository
+  url: https://github.com/Broderick-Westrope/e-gommerce
+host: localhost:4000
+info:
+  contact:
+    email: broderickwestrope@gmail.com
+    name: Broderick Westrope
+  description: A toy e-commerce backend made with Go.
+  license:
+    name: GNU General Public License v3.0
+    url: https://www.gnu.org/licenses/gpl-3.0
+  title: E-Gommerce API
+  version: "0.1"
+paths:
+  /products:
+    get:
+      description: Retrieves all products stored in the database.
+      operationId: get-products
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Product'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Get all products
+      tags:
+      - products
+swagger: "2.0"
