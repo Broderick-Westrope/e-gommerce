@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"time"
 
+	// Required for swagger docs.
 	_ "github.com/Broderick-Westrope/e-gommerce/api"
 	"github.com/Broderick-Westrope/e-gommerce/internal/config"
 	"github.com/Broderick-Westrope/e-gommerce/internal/storage"

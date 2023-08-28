@@ -1,7 +1,6 @@
 package api
 
 import (
-	_ "database/sql"
 	"errors"
 	"net/http"
 	"strconv"
