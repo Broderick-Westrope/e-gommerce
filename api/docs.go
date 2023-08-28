@@ -230,6 +230,9 @@ const docTemplate = `{
             "properties": {
                 "error": {
                     "type": "string"
+                },
+                "error_id": {
+                    "type": "string"
                 }
             }
         },
