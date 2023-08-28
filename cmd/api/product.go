@@ -77,6 +77,16 @@ func getProduct(srv Server) http.HandlerFunc {
 	}
 }
 
+//	@Summary		Create a product
+//	@Description	Creates a product.
+//	@ID				create-product
+//	@Tags			products
+//	@Accept			json
+//	@Produce		json
+//	@Param			product	body		models.CreateProductRequest	true	"Product"
+//	@Success		201		{object}	idResponse					"Product ID"
+//	@Failure		500		{object}	errorResponse				"Internal Server Error"
+//	@Router			/products [post]
 func createProduct(srv Server) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var createProductReq models.CreateProductRequest

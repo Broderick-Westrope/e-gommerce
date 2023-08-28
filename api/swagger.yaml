@@ -5,6 +5,22 @@ definitions:
       error:
         type: string
     type: object
+  api.idResponse:
+    properties:
+      id:
+        type: integer
+    type: object
+  models.CreateProductRequest:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+      price:
+        type: number
+      stock_quantity:
+        type: integer
+    type: object
   models.Product:
     properties:
       description:
@@ -59,6 +75,32 @@ paths:
           schema:
             $ref: '#/definitions/api.errorResponse'
       summary: Get all products
+      tags:
+      - products
+    post:
+      consumes:
+      - application/json
+      description: Creates a product.
+      operationId: create-product
+      parameters:
+      - description: Product
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateProductRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Product ID
+          schema:
+            $ref: '#/definitions/api.idResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.errorResponse'
+      summary: Create a product
       tags:
       - products
   /products/{id}:
