@@ -8,6 +8,10 @@ import (
 	"github.com/Broderick-Westrope/e-gommerce/internal/config"
 )
 
+type errorResponse struct {
+	Error string `json:"error"`
+}
+
 // respondWithJSON is a helper function to respond with the JSON payload.
 // It also sets the Content-Type header to application/json.
 // If the JSON payload cannot be encoded, it will write an Internal Server Error to the response.
@@ -53,6 +57,6 @@ func parseJSONBody(r *http.Request, dst interface{}) error {
 }
 
 // createErrorResponse is a helper function to create an error response map.
-func createErrorResponse(message string) map[string]string {
-	return map[string]string{"error": message}
+func createErrorResponse(message string) errorResponse {
+	return errorResponse{Error: message}
 }
