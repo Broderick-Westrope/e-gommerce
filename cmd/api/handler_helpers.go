@@ -32,11 +32,12 @@ func respondWithJSON(w http.ResponseWriter, logger config.Logger, statusCode int
 	var buf bytes.Buffer
 	err := json.NewEncoder(&buf).Encode(payload)
 	if err != nil {
-		response := createErrorResponse("Failed to encode JSON payload", logger)
+		messages := []string{"Failed to encode JSON payload", "encode_error", err.Error()}
+		response := createErrorResponse(logger, messages...)
 		w.WriteHeader(http.StatusInternalServerError)
 		err = json.NewEncoder(w).Encode(response)
 		if err != nil {
-			logger.Error("Failed to encode JSON payload for error response: " + err.Error())
+			logger.Error("Failed to encode JSON payload for error response", "encode_error", err.Error())
 		}
 		return
 	}
@@ -44,10 +45,13 @@ func respondWithJSON(w http.ResponseWriter, logger config.Logger, statusCode int
 	w.WriteHeader(statusCode)
 	_, err = w.Write(buf.Bytes())
 	if err != nil {
-		logger.Error("Failed to write JSON payload: " + err.Error())
+		// Since the response has already been written, we can only log the error.
+		logger.Error("Failed to write JSON payload", "write_error", err.Error())
 	}
 }
 
+// respondWithID is a helper function to respond with an idResponse.
+// It also sets the Content-Type header to application/json.
 func respondWithID(w http.ResponseWriter, logger config.Logger, statusCode int, id int) {
 	response := idResponse{id}
 	respondWithJSON(w, logger, statusCode, response)
@@ -55,8 +59,9 @@ func respondWithID(w http.ResponseWriter, logger config.Logger, statusCode int, 
 
 // respondWithError is a helper function to respond with an errorResponse.
 // It also sets the Content-Type header to application/json.
-func respondWithError(w http.ResponseWriter, logger config.Logger, statusCode int, message string) {
-	errResponse := createErrorResponse(message, logger)
+// It will log all messages to the logger. Check the logger implementation for more details.
+func respondWithError(w http.ResponseWriter, logger config.Logger, statusCode int, messages ...string) {
+	errResponse := createErrorResponse(logger, messages...)
 	respondWithJSON(w, logger, statusCode, errResponse)
 }
 
@@ -65,9 +70,19 @@ func parseJSONBody(r *http.Request, dst interface{}) error {
 	return json.NewDecoder(r.Body).Decode(dst)
 }
 
-// createErrorResponse is a helper function to create an errorResponse and logs the error.
-func createErrorResponse(message string, logger config.Logger) errorResponse {
+// createErrorResponse is a helper function to create an errorResponse using all the first message.
+// It will log all messages to the logger. Check the logger implementation for more details.
+func createErrorResponse(logger config.Logger, messages ...string) errorResponse {
 	errID := ulid.Make()
-	logger.Error(message, "error_id", errID.String())
-	return errorResponse{ID: errID.String(), Error: message}
+	response := errorResponse{ID: errID.String(), Error: messages[0]}
+
+	args := []interface{}{"error_id", errID.String()}
+	for _, s := range messages[1:] {
+		if s != "" {
+			args = append(args, s)
+		}
+	}
+
+	logger.Error(messages[0], args...)
+	return response
 }
