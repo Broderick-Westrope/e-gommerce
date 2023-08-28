@@ -104,6 +104,29 @@ paths:
       tags:
       - products
   /products/{id}:
+    delete:
+      description: Deletes a product.
+      operationId: delete-product
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Invalid parameter 'id'
+          schema:
+            $ref: '#/definitions/api.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.errorResponse'
+      summary: Delete a product
+      tags:
+      - products
     get:
       description: Retrieves a product by ID.
       operationId: get-product

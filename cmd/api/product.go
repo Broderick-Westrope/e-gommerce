@@ -145,6 +145,15 @@ func updateProduct(srv Server) http.HandlerFunc {
 	}
 }
 
+//	@Summary		Delete a product
+//	@Description	Deletes a product.
+//	@ID				delete-product
+//	@Tags			products
+//	@Param			id	path	int	true	"Product ID"
+//	@Success		204
+//	@Failure		400	{object}	errorResponse	"Invalid parameter 'id'"
+//	@Failure		500	{object}	errorResponse	"Internal Server Error"
+//	@Router			/products/{id} [delete]
 func deleteProduct(srv Server) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.Atoi(chi.URLParam(r, "id"))
