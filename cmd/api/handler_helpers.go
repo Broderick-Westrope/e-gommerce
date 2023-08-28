@@ -6,9 +6,11 @@ import (
 	"net/http"
 
 	"github.com/Broderick-Westrope/e-gommerce/internal/config"
+	"github.com/oklog/ulid/v2"
 )
 
 type errorResponse struct {
+	ID    string `json:"error_id"`
 	Error string `json:"error"`
 }
 
@@ -30,12 +32,12 @@ func respondWithJSON(w http.ResponseWriter, logger config.Logger, statusCode int
 	var buf bytes.Buffer
 	err := json.NewEncoder(&buf).Encode(payload)
 	if err != nil {
-		errMsg := "Failed to encode JSON payload"
-		logger.Error(errMsg)
+		messages := []string{"Failed to encode JSON payload", "encode_error", err.Error()}
+		response := createErrorResponse(logger, messages...)
 		w.WriteHeader(http.StatusInternalServerError)
-		err = json.NewEncoder(w).Encode(createErrorResponse(errMsg))
+		err = json.NewEncoder(w).Encode(response)
 		if err != nil {
-			logger.Error("Failed to encode JSON payload for error response: " + err.Error())
+			logger.Error("Failed to encode JSON payload for error response", "encode_error", err.Error())
 		}
 		return
 	}
@@ -43,21 +45,24 @@ func respondWithJSON(w http.ResponseWriter, logger config.Logger, statusCode int
 	w.WriteHeader(statusCode)
 	_, err = w.Write(buf.Bytes())
 	if err != nil {
-		logger.Error("Failed to write JSON payload: " + err.Error())
+		// Since the response has already been written, we can only log the error.
+		logger.Error("Failed to write JSON payload", "write_error", err.Error())
 	}
 }
 
+// respondWithID is a helper function to respond with an idResponse.
+// It also sets the Content-Type header to application/json.
 func respondWithID(w http.ResponseWriter, logger config.Logger, statusCode int, id int) {
-	mapResponse := idResponse{id}
-	respondWithJSON(w, logger, statusCode, mapResponse)
+	response := idResponse{id}
+	respondWithJSON(w, logger, statusCode, response)
 }
 
-// respondWithError is a helper function to respond with an error.
+// respondWithError is a helper function to respond with an errorResponse.
 // It also sets the Content-Type header to application/json.
-func respondWithError(w http.ResponseWriter, logger config.Logger, statusCode int, message string) {
-	logger.Error(message)
-	mapResponse := createErrorResponse(message)
-	respondWithJSON(w, logger, statusCode, mapResponse)
+// It will log all messages to the logger. Check the logger implementation for more details.
+func respondWithError(w http.ResponseWriter, logger config.Logger, statusCode int, messages ...string) {
+	errResponse := createErrorResponse(logger, messages...)
+	respondWithJSON(w, logger, statusCode, errResponse)
 }
 
 // parseJSONBody unmarshals the JSON payload and stores the result in the provided destination.
@@ -65,7 +70,19 @@ func parseJSONBody(r *http.Request, dst interface{}) error {
 	return json.NewDecoder(r.Body).Decode(dst)
 }
 
-// createErrorResponse is a helper function to create an error response map.
-func createErrorResponse(message string) errorResponse {
-	return errorResponse{Error: message}
+// createErrorResponse is a helper function to create an errorResponse using all the first message.
+// It will log all messages to the logger. Check the logger implementation for more details.
+func createErrorResponse(logger config.Logger, messages ...string) errorResponse {
+	errID := ulid.Make()
+	response := errorResponse{ID: errID.String(), Error: messages[0]}
+
+	args := []interface{}{"error_id", errID.String()}
+	for _, s := range messages[1:] {
+		if s != "" {
+			args = append(args, s)
+		}
+	}
+
+	logger.Error(messages[0], args...)
+	return response
 }

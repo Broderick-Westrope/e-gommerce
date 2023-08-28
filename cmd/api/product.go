@@ -34,7 +34,8 @@ func getProducts(srv Server) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		products, err := srv.Storage().GetProducts()
 		if err != nil {
-			respondWithError(w, srv.Logger(), http.StatusInternalServerError, err.Error())
+			messages := []string{"Failed to get products", "get_products_error", err.Error()}
+			respondWithError(w, srv.Logger(), http.StatusInternalServerError, messages...)
 			return
 		}
 
@@ -57,7 +58,8 @@ func getProduct(srv Server) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.Atoi(chi.URLParam(r, "id"))
 		if err != nil {
-			respondWithError(w, srv.Logger(), http.StatusBadRequest, "Invalid parameter 'id'")
+			messages := []string{"Invalid parameter 'id'", "atoi_error", err.Error()}
+			respondWithError(w, srv.Logger(), http.StatusBadRequest, messages...)
 			return
 		}
 
@@ -68,7 +70,8 @@ func getProduct(srv Server) http.HandlerFunc {
 				respondWithError(w, srv.Logger(), http.StatusNotFound, "Product not found")
 				return
 			}
-			respondWithError(w, srv.Logger(), http.StatusInternalServerError, "Failed to get product: "+err.Error())
+			messages := []string{"Failed to get product", "get_product_error", err.Error()}
+			respondWithError(w, srv.Logger(), http.StatusInternalServerError, messages...)
 			return
 		}
 
@@ -91,14 +94,16 @@ func createProduct(srv Server) http.HandlerFunc {
 		var createProductReq models.CreateProductRequest
 		err := parseJSONBody(r, &createProductReq)
 		if err != nil {
-			respondWithError(w, srv.Logger(), http.StatusInternalServerError, "Failed to parse JSON payload: "+err.Error())
+			messages := []string{"Failed to parse JSON payload", "parse_json_body_error", err.Error()}
+			respondWithError(w, srv.Logger(), http.StatusInternalServerError, messages...)
 			return
 		}
 
 		var id int
 		id, err = srv.Storage().CreateProduct(&createProductReq)
 		if err != nil {
-			respondWithError(w, srv.Logger(), http.StatusInternalServerError, "Failed to create product: "+err.Error())
+			messages := []string{"Failed to create product", "create_product_error", err.Error()}
+			respondWithError(w, srv.Logger(), http.StatusInternalServerError, messages...)
 			return
 		}
 
@@ -122,21 +127,24 @@ func updateProduct(srv Server) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.Atoi(chi.URLParam(r, "id"))
 		if err != nil {
-			respondWithError(w, srv.Logger(), http.StatusBadRequest, "Invalid parameter 'id'")
+			messages := []string{"Invalid parameter 'id'", "atoi_error", err.Error()}
+			respondWithError(w, srv.Logger(), http.StatusBadRequest, messages...)
 			return
 		}
 
 		var createProductReq models.CreateProductRequest
 		err = parseJSONBody(r, &createProductReq)
 		if err != nil {
-			respondWithError(w, srv.Logger(), http.StatusInternalServerError, "Failed to parse JSON payload: "+err.Error())
+			messages := []string{"Failed to parse JSON payload", "parse_json_body_error", err.Error()}
+			respondWithError(w, srv.Logger(), http.StatusInternalServerError, messages...)
 			return
 		}
 
 		product := createProductReq.ToProduct(id)
 		err = srv.Storage().UpdateProduct(product)
 		if err != nil {
-			respondWithError(w, srv.Logger(), http.StatusInternalServerError, "Failed to update product: "+err.Error())
+			messages := []string{"Failed to update product", "update_product_error", err.Error()}
+			respondWithError(w, srv.Logger(), http.StatusInternalServerError, messages...)
 			return
 		}
 
@@ -157,13 +165,15 @@ func deleteProduct(srv Server) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.Atoi(chi.URLParam(r, "id"))
 		if err != nil {
-			respondWithError(w, srv.Logger(), http.StatusBadRequest, "Invalid parameter 'id'")
+			messages := []string{"Invalid parameter 'id'", "atoi_error", err.Error()}
+			respondWithError(w, srv.Logger(), http.StatusBadRequest, messages...)
 			return
 		}
 
 		err = srv.Storage().DeleteProduct(id)
 		if err != nil {
-			respondWithError(w, srv.Logger(), http.StatusInternalServerError, "Failed to delete product: "+err.Error())
+			messages := []string{"Failed to delete product", "delete_product_error", err.Error()}
+			respondWithError(w, srv.Logger(), http.StatusInternalServerError, messages...)
 			return
 		}
 

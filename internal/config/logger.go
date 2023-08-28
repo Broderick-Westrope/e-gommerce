@@ -84,6 +84,11 @@ func (l *Log) createLog(level, msg string, args ...interface{}) {
 
 	// Loop through all args and format them as key-value pairs.
 	for i := 0; i < len(args); i += 2 {
+		// If there is an odd number of args, the last one is a value with an unknown key.
+		if i == len(args)-1 {
+			fmt.Fprintf(w, ",\t%v: %v", "odd_args_key", args[i])
+			continue
+		}
 		fmt.Fprintf(w, ",\t%v: %v", args[i], args[i+1])
 	}
 

@@ -4,6 +4,8 @@ definitions:
     properties:
       error:
         type: string
+      error_id:
+        type: string
     type: object
   api.idResponse:
     properties:
