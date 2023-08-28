@@ -56,6 +56,21 @@ func (srv *chiServer) RateLimit() int {
 	return srv.rateLimit
 }
 
+//	@title			E-Gommerce API
+//	@version		0.1
+//	@description	A toy e-commerce backend made with Go.
+
+//	@externalDocs.description	GitHub repository
+//	@externalDocs.url			https://github.com/Broderick-Westrope/e-gommerce
+
+//	@contact.name	Broderick Westrope
+//	@contact.email	broderickwestrope@gmail.com
+
+//	@license.name	GNU General Public License v3.0
+//	@license.url	https://www.gnu.org/licenses/gpl-3.0
+
+//	@host		localhost:4000
+//	@BasePath	/v1/api
 func (srv *chiServer) MountHandlers() {
 	// Routes
 	srv.mux.Use(middleware.Logger)
@@ -69,6 +84,7 @@ func (srv *chiServer) MountHandlers() {
 		time.Minute,
 		httprate.WithKeyFuncs(httprate.KeyByIP, httprate.KeyByEndpoint),
 	))
+
 	srv.mux.Route("/v1", func(r chi.Router) {
 		r.Mount("/api/products", ProductRoutes(srv))
 	})
