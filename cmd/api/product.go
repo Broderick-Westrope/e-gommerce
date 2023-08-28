@@ -93,7 +93,7 @@ func createProduct(srv Server) http.HandlerFunc {
 			return
 		}
 
-		respondWithJSON(w, srv.Logger(), http.StatusCreated, map[string]int{"id": id})
+		respondWithID(w, srv.Logger(), http.StatusCreated, id)
 	}
 }
 

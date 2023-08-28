@@ -12,6 +12,10 @@ type errorResponse struct {
 	Error string `json:"error"`
 }
 
+type idResponse struct {
+	ID int `json:"id"`
+}
+
 // respondWithJSON is a helper function to respond with the JSON payload.
 // It also sets the Content-Type header to application/json.
 // If the JSON payload cannot be encoded, it will write an Internal Server Error to the response.
@@ -41,6 +45,11 @@ func respondWithJSON(w http.ResponseWriter, logger config.Logger, statusCode int
 	if err != nil {
 		logger.Error("Failed to write JSON payload: " + err.Error())
 	}
+}
+
+func respondWithID(w http.ResponseWriter, logger config.Logger, statusCode int, id int) {
+	mapResponse := idResponse{id}
+	respondWithJSON(w, logger, statusCode, mapResponse)
 }
 
 // respondWithError is a helper function to respond with an error.

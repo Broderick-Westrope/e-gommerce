@@ -186,10 +186,6 @@ func TestServer_ProductRoutes_CreateProduct(t *testing.T) {
 	srv := newTestServer()
 	srv.MountHandlers()
 
-	type idResponse struct {
-		ID int `json:"id"`
-	}
-
 	tt := []struct {
 		name               string
 		createProductReq   models.CreateProductRequest
