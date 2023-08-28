@@ -4,11 +4,13 @@ import (
 	"net/http"
 	"time"
 
+	_ "github.com/Broderick-Westrope/e-gommerce/api"
 	"github.com/Broderick-Westrope/e-gommerce/internal/config"
 	"github.com/Broderick-Westrope/e-gommerce/internal/storage"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/httprate"
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 type Server interface {
@@ -72,7 +74,7 @@ func (srv *chiServer) RateLimit() int {
 //	@host		localhost:4000
 //	@BasePath	/v1/api
 func (srv *chiServer) MountHandlers() {
-	// Routes
+	// Middleware
 	srv.mux.Use(middleware.Logger)
 	srv.mux.Use(middleware.Heartbeat("/ping"))
 	srv.mux.Use(middleware.AllowContentType("application/json"))
@@ -85,6 +87,10 @@ func (srv *chiServer) MountHandlers() {
 		httprate.WithKeyFuncs(httprate.KeyByIP, httprate.KeyByEndpoint),
 	))
 
+	srv.mux.Get("/swagger/*", httpSwagger.Handler(
+		httpSwagger.URL("/swagger/doc.json"), // The url pointing to API definition"
+	))
+	// Routes
 	srv.mux.Route("/v1", func(r chi.Router) {
 		r.Mount("/api/products", ProductRoutes(srv))
 	})
