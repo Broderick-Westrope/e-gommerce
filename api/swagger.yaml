@@ -1,5 +1,10 @@
 basePath: /v1/api
 definitions:
+  api.errorResponse:
+    properties:
+      error:
+        type: string
+    type: object
   models.Product:
     properties:
       description:
@@ -38,7 +43,7 @@ info:
 paths:
   /products:
     get:
-      description: Retrieves all products stored in the database.
+      description: Retrieves all products.
       operationId: get-products
       produces:
       - application/json
@@ -52,8 +57,40 @@ paths:
         "500":
           description: Internal Server Error
           schema:
-            type: string
+            $ref: '#/definitions/api.errorResponse'
       summary: Get all products
+      tags:
+      - products
+  /products/{id}:
+    get:
+      description: Retrieves a product by ID.
+      operationId: get-product
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Product'
+        "400":
+          description: Invalid parameter 'id'
+          schema:
+            $ref: '#/definitions/api.errorResponse'
+        "404":
+          description: Product not found
+          schema:
+            $ref: '#/definitions/api.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.errorResponse'
+      summary: Get a product
       tags:
       - products
 swagger: "2.0"
