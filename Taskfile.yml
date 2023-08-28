@@ -21,8 +21,13 @@ tasks:
     cmds:
       - go run . {{.CLI_ARGS}}
   pcc:
-    desc: "runs several pre-commit checks"
+    desc: "runs several pre-commit checks and generates swagger documentation"
     cmds:
       - task: build
       - task: test
       - task: lint
+  swag:
+    desc: "generate and format swagger documentation"
+    cmds:
+      - "swag init -o './api' -g './cmd/api/server.go' --parseDependency"
+      - "swag fmt"
