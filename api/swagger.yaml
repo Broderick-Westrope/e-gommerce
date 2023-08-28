@@ -1,0 +1,194 @@
+basePath: /v1/api
+definitions:
+  api.errorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  api.idResponse:
+    properties:
+      id:
+        type: integer
+    type: object
+  models.CreateProductRequest:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+      price:
+        type: number
+      stock_quantity:
+        type: integer
+    type: object
+  models.Product:
+    properties:
+      description:
+        $ref: '#/definitions/sql.NullString'
+      id:
+        type: integer
+      name:
+        type: string
+      price:
+        type: number
+      stock_quantity:
+        type: integer
+    type: object
+  sql.NullString:
+    properties:
+      string:
+        type: string
+      valid:
+        description: Valid is true if String is not NULL
+        type: boolean
+    type: object
+externalDocs:
+  description: GitHub repository
+  url: https://github.com/Broderick-Westrope/e-gommerce
+host: localhost:4000
+info:
+  contact:
+    email: broderickwestrope@gmail.com
+    name: Broderick Westrope
+  description: A toy e-commerce backend made with Go.
+  license:
+    name: GNU General Public License v3.0
+    url: https://www.gnu.org/licenses/gpl-3.0
+  title: E-Gommerce API
+  version: "0.1"
+paths:
+  /products:
+    get:
+      description: Retrieves all products.
+      operationId: get-products
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Products
+          schema:
+            items:
+              $ref: '#/definitions/models.Product'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.errorResponse'
+      summary: Get all products
+      tags:
+      - products
+    post:
+      consumes:
+      - application/json
+      description: Creates a product.
+      operationId: create-product
+      parameters:
+      - description: Product
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateProductRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Product ID
+          schema:
+            $ref: '#/definitions/api.idResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.errorResponse'
+      summary: Create a product
+      tags:
+      - products
+  /products/{id}:
+    delete:
+      description: Deletes a product.
+      operationId: delete-product
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Invalid parameter 'id'
+          schema:
+            $ref: '#/definitions/api.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.errorResponse'
+      summary: Delete a product
+      tags:
+      - products
+    get:
+      description: Retrieves a product by ID.
+      operationId: get-product
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Product
+          schema:
+            $ref: '#/definitions/models.Product'
+        "400":
+          description: Invalid parameter 'id'
+          schema:
+            $ref: '#/definitions/api.errorResponse'
+        "404":
+          description: Product not found
+          schema:
+            $ref: '#/definitions/api.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.errorResponse'
+      summary: Get a product
+      tags:
+      - products
+    put:
+      consumes:
+      - application/json
+      description: Updates a product.
+      operationId: update-product
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Product
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateProductRequest'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Invalid parameter 'id'
+          schema:
+            $ref: '#/definitions/api.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.errorResponse'
+      summary: Update a product
+      tags:
+      - products
+swagger: "2.0"

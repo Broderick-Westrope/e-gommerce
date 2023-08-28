@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"reflect"
 	"testing"
 
 	"github.com/Broderick-Westrope/e-gommerce/internal/models"
@@ -64,12 +63,8 @@ func TestServer_ProductRoutes_GetProducts(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
-			for _, productReq := range tc.products {
-				_, err := srv.Storage().CreateProduct(&productReq)
-				if err != nil {
-					t.Error(fmt.Errorf("Error creating product: %w", err))
-				}
-			}
+			addProducts(t, srv, tc.products)
+			defer removeProducts(t, srv, tc.expectedProducts)
 
 			rr := httptest.NewRecorder()
 			req, err := http.NewRequest(method, url, nil)
@@ -79,9 +74,7 @@ func TestServer_ProductRoutes_GetProducts(t *testing.T) {
 
 			srv.Mux().ServeHTTP(rr, req)
 
-			if rr.Code != tc.expectedStatusCode {
-				t.Errorf("Status Code: got %d; want %d", rr.Code, tc.expectedStatusCode)
-			}
+			checkEqual(t, rr.Code, tc.expectedStatusCode, "Status Code")
 
 			products := new([]models.Product)
 			err = json.NewDecoder(rr.Body).Decode(products)
@@ -89,19 +82,9 @@ func TestServer_ProductRoutes_GetProducts(t *testing.T) {
 				t.Error(fmt.Errorf("Error decoding JSON response: %w", err))
 			}
 
-			if len(*products) != len(tc.expectedProducts) {
-				t.Errorf("Products Length: got %d; want %d", len(*products), len(tc.expectedProducts))
-			}
-			if !reflect.DeepEqual(*products, tc.expectedProducts) {
-				t.Errorf("Products: got %v; want %v", *products, tc.expectedProducts)
-			}
+			checkEqual(t, len(*products), len(tc.expectedProducts), "Products Length")
 
-			for _, product := range *products {
-				err = srv.Storage().DeleteProduct(product.ID)
-				if err != nil {
-					t.Error(fmt.Errorf("Error deleting product: %w", err))
-				}
-			}
+			checkEqual(t, *products, tc.expectedProducts, "Products")
 		})
 	}
 }
@@ -162,9 +145,7 @@ func TestServer_ProductRoutes_GetProduct(t *testing.T) {
 
 			srv.Mux().ServeHTTP(rr, req)
 
-			if rr.Code != tc.expectedStatusCode {
-				t.Errorf("Status Code: got %d; want %d", rr.Code, tc.expectedStatusCode)
-			}
+			checkEqual(t, rr.Code, tc.expectedStatusCode, "Status Code")
 
 			product := new(models.Product)
 			err = json.NewDecoder(rr.Body).Decode(product)
@@ -172,9 +153,7 @@ func TestServer_ProductRoutes_GetProduct(t *testing.T) {
 				t.Error(fmt.Errorf("Error decoding JSON response: %w", err))
 			}
 
-			if !reflect.DeepEqual(*product, tc.expectedProduct) {
-				t.Errorf("Product: got '%v'; want '%v'", *product, tc.expectedProduct)
-			}
+			checkEqual(t, *product, tc.expectedProduct, "Product")
 		})
 	}
 }
@@ -183,12 +162,12 @@ func TestServer_ProductRoutes_CreateProduct(t *testing.T) {
 	method := http.MethodPost
 	url := "/v1/api/products/"
 
-	srv := newTestServer()
-	srv.MountHandlers()
-
 	type idResponse struct {
 		ID int `json:"id"`
 	}
+
+	srv := newTestServer()
+	srv.MountHandlers()
 
 	tt := []struct {
 		name               string
@@ -225,9 +204,7 @@ func TestServer_ProductRoutes_CreateProduct(t *testing.T) {
 
 			srv.Mux().ServeHTTP(rr, req)
 
-			if rr.Code != tc.expectedStatusCode {
-				t.Errorf("Status Code: got %d; want %d", rr.Code, tc.expectedStatusCode)
-			}
+			checkEqual(t, rr.Code, tc.expectedStatusCode, "Status Code")
 
 			id := new(idResponse)
 			err = json.NewDecoder(rr.Body).Decode(&id)
@@ -235,8 +212,11 @@ func TestServer_ProductRoutes_CreateProduct(t *testing.T) {
 				t.Error(fmt.Errorf("Error decoding JSON response: %w", err))
 			}
 
-			if id.ID != tc.expectedID {
-				t.Errorf("Id: got %d; want %d", id, tc.expectedID)
+			checkEqual(t, id.ID, tc.expectedID, "ID")
+
+			err = srv.Storage().DeleteProduct(id.ID)
+			if err != nil {
+				t.Error(fmt.Errorf("Error deleting product: %w", err))
 			}
 		})
 	}
@@ -309,9 +289,7 @@ func TestServer_ProductRoutes_UpdateProduct(t *testing.T) {
 
 			srv.Mux().ServeHTTP(rr, req)
 
-			if rr.Code != tc.expectedStatusCode {
-				t.Errorf("Status Code: got %d; want %d", rr.Code, tc.expectedStatusCode)
-			}
+			checkEqual(t, rr.Code, tc.expectedStatusCode, "Status Code")
 
 			err = srv.Storage().DeleteProduct(productID)
 			if err != nil {
@@ -371,9 +349,7 @@ func TestServer_ProductRoutes_DeleteProduct(t *testing.T) {
 
 			srv.Mux().ServeHTTP(rr, req)
 
-			if rr.Code != tc.expectedStatusCode {
-				t.Errorf("Status Code: got %d; want %d", rr.Code, tc.expectedStatusCode)
-			}
+			checkEqual(t, rr.Code, tc.expectedStatusCode, "Status Code")
 
 			if rr.Code == http.StatusNoContent {
 				_, err = srv.Storage().GetProduct(productID)

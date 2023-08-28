@@ -4,11 +4,14 @@ import (
 	"net/http"
 	"time"
 
+	// Required for swagger docs.
+	_ "github.com/Broderick-Westrope/e-gommerce/api"
 	"github.com/Broderick-Westrope/e-gommerce/internal/config"
 	"github.com/Broderick-Westrope/e-gommerce/internal/storage"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/httprate"
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 type Server interface {
@@ -56,8 +59,23 @@ func (srv *chiServer) RateLimit() int {
 	return srv.rateLimit
 }
 
+//	@title			E-Gommerce API
+//	@version		0.1
+//	@description	A toy e-commerce backend made with Go.
+
+//	@externalDocs.description	GitHub repository
+//	@externalDocs.url			https://github.com/Broderick-Westrope/e-gommerce
+
+//	@contact.name	Broderick Westrope
+//	@contact.email	broderickwestrope@gmail.com
+
+//	@license.name	GNU General Public License v3.0
+//	@license.url	https://www.gnu.org/licenses/gpl-3.0
+
+//	@host		localhost:4000
+//	@BasePath	/v1/api
 func (srv *chiServer) MountHandlers() {
-	// Routes
+	// Middleware
 	srv.mux.Use(middleware.Logger)
 	srv.mux.Use(middleware.Heartbeat("/ping"))
 	srv.mux.Use(middleware.AllowContentType("application/json"))
@@ -69,6 +87,11 @@ func (srv *chiServer) MountHandlers() {
 		time.Minute,
 		httprate.WithKeyFuncs(httprate.KeyByIP, httprate.KeyByEndpoint),
 	))
+
+	srv.mux.Get("/swagger/*", httpSwagger.Handler(
+		httpSwagger.URL("/swagger/doc.json"), // The url pointing to API definition"
+	))
+	// Routes
 	srv.mux.Route("/v1", func(r chi.Router) {
 		r.Mount("/api/products", ProductRoutes(srv))
 	})

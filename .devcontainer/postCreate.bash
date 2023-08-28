@@ -8,3 +8,6 @@ golangci-lint --version
 
 # install task for taskfile
 go install github.com/go-task/task/v3/cmd/task@latest
+
+# install swag for swagger docs generation
+go install github.com/swaggo/swag/cmd/swag@latest
