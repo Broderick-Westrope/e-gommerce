@@ -328,3 +328,7 @@ issues:
         - gosec
         - noctx
         - wrapcheck
+    # Exclude this rule that occurs after running swag formatter
+    - linters:
+        - goimports
+      text: "File is not `goimports`-ed"
