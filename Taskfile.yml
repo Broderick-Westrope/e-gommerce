@@ -26,6 +26,7 @@ tasks:
       - task: build
       - task: test
       - task: lint
+      - task: swag
   swag:
     desc: "generate and format swagger documentation"
     cmds:
