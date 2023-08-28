@@ -65,7 +65,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Products
           schema:
             items:
               $ref: '#/definitions/models.Product'
@@ -117,7 +117,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Product
           schema:
             $ref: '#/definitions/models.Product'
         "400":
@@ -133,6 +133,39 @@ paths:
           schema:
             $ref: '#/definitions/api.errorResponse'
       summary: Get a product
+      tags:
+      - products
+    put:
+      consumes:
+      - application/json
+      description: Updates a product.
+      operationId: update-product
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Product
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateProductRequest'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Invalid parameter 'id'
+          schema:
+            $ref: '#/definitions/api.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.errorResponse'
+      summary: Update a product
       tags:
       - products
 swagger: "2.0"

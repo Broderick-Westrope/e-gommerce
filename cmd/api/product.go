@@ -28,7 +28,7 @@ func ProductRoutes(srv Server) *chi.Mux {
 //	@ID				get-products
 //	@Tags			products
 //	@Produce		json
-//	@Success		200	{array}		models.Product
+//	@Success		200	{array}		models.Product	"Products"
 //	@Failure		500	{object}	errorResponse	"Internal Server Error"
 //	@Router			/products [get]
 func getProducts(srv Server) http.HandlerFunc {
@@ -48,8 +48,8 @@ func getProducts(srv Server) http.HandlerFunc {
 //	@ID				get-product
 //	@Tags			products
 //	@Produce		json
-//	@Param			id	path		int	true	"Product ID"
-//	@Success		200	{object}	models.Product
+//	@Param			id	path		int				true	"Product ID"
+//	@Success		200	{object}	models.Product	"Product"
 //	@Failure		400	{object}	errorResponse	"Invalid parameter 'id'"
 //	@Failure		404	{object}	errorResponse	"Product not found"
 //	@Failure		500	{object}	errorResponse	"Internal Server Error"
@@ -107,6 +107,18 @@ func createProduct(srv Server) http.HandlerFunc {
 	}
 }
 
+//	@Summary		Update a product
+//	@Description	Updates a product.
+//	@ID				update-product
+//	@Tags			products
+//	@Accept			json
+//	@Produce		json
+//	@Param			id		path	int							true	"Product ID"
+//	@Param			product	body	models.CreateProductRequest	true	"Product"
+//	@Success		204
+//	@Failure		400	{object}	errorResponse	"Invalid parameter 'id'"
+//	@Failure		500	{object}	errorResponse	"Internal Server Error"
+//	@Router			/products/{id} [put]
 func updateProduct(srv Server) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.Atoi(chi.URLParam(r, "id"))
