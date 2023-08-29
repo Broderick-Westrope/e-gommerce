@@ -8,6 +8,7 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
+// testServer is a mock implementation of the Server interface.
 type testServer struct {
 	mux     *chi.Mux
 	storage *storage.TestStore

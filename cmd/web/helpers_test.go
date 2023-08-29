@@ -9,6 +9,8 @@ import (
 	"github.com/Broderick-Westrope/e-gommerce/internal/models"
 )
 
+// Check that got and want are equal, and if not, log an error to t.
+// msg should be a short description of what is being tested (eg. "Status Code").
 func checkEqual(t *testing.T, got, want interface{}, msg string) {
 	t.Helper()
 
@@ -17,6 +19,7 @@ func checkEqual(t *testing.T, got, want interface{}, msg string) {
 	}
 }
 
+// Adds the products to srv's storage.
 func addProducts(t *testing.T, srv web.Server, products []models.CreateProductRequest) {
 	t.Helper()
 
@@ -28,6 +31,7 @@ func addProducts(t *testing.T, srv web.Server, products []models.CreateProductRe
 	}
 }
 
+// Removes the products from srv's storage.
 func removeProducts(t *testing.T, srv web.Server, products []models.Product) {
 	t.Helper()
 

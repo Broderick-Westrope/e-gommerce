@@ -12,6 +12,7 @@ import (
 	"github.com/Broderick-Westrope/e-gommerce/internal/models"
 )
 
+// Tests the Get Products route through the server.
 func TestServer_ProductRoutes_GetProducts(t *testing.T) {
 	method := http.MethodGet
 	url := "/v1/api/products"
@@ -89,6 +90,7 @@ func TestServer_ProductRoutes_GetProducts(t *testing.T) {
 	}
 }
 
+// Tests the Get Product route through the server.
 func TestServer_ProductRoutes_GetProduct(t *testing.T) {
 	method := http.MethodGet
 	url := "/v1/api/products/"
@@ -158,6 +160,7 @@ func TestServer_ProductRoutes_GetProduct(t *testing.T) {
 	}
 }
 
+// Tests the Create Product route through the server.
 func TestServer_ProductRoutes_CreateProduct(t *testing.T) {
 	method := http.MethodPost
 	url := "/v1/api/products/"
@@ -222,6 +225,7 @@ func TestServer_ProductRoutes_CreateProduct(t *testing.T) {
 	}
 }
 
+// Tests the Update Product route through the server.
 func TestServer_ProductRoutes_UpdateProduct(t *testing.T) {
 	method := http.MethodPut
 	url := "/v1/api/products/"
@@ -310,6 +314,7 @@ func TestServer_ProductRoutes_UpdateProduct(t *testing.T) {
 	}
 }
 
+// Tests the Delete Product route through the server.
 func TestServer_ProductRoutes_DeleteProduct(t *testing.T) {
 	method := http.MethodDelete
 	url := "/v1/api/products/"
