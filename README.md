@@ -19,13 +19,14 @@ E-Gommerce is designed for developers who are learning Go and want to explore re
 
 ## Technologies Used
 
-- Routing: Chi
-- Middleware: httprate, Logger, Heartbeat, CleanPath, AllowContentType, Recoverer, RedirectSlashes, Limit
-- Database: MariaDB with go-sql-driver/mysql
-- Environment Variables: joho/godotenv
-- Swagger Documentation: swaggo/swag and swaggo/http-swagger
-- Dependency Management: Go modules
-- Task Automation: Taskfile
+- Routing: [Chi](https://go-chi.io/)
+- Middleware: [httprate](https://github.com/go-chi/httprate), Logger, Heartbeat, CleanPath, AllowContentType, Recoverer, RedirectSlashes, Limit (See [Chi Middleware](https://go-chi.io/#/pages/middleware))
+- Database: MariaDB with [go-sql-driver/mysql](https://github.com/go-sql-driver/mysql)
+- Environment Variables: [joho/godotenv](https://github.com/joho/godotenv)
+- Swagger Documentation: [swaggo/swag](https://github.com/swaggo/swag) and [swaggo/http-swagger](https://github.com/swaggo/http-swagger)
+- [Task Automation](#task-automation): [Taskfile](https://taskfile.dev/)
+- Linting: [golangci-lint](https://golangci-lint.run/)
+- [Live Reloading](#live-reloading): [Air](https://github.com/cosmtrek/air)
 
 ## Installation
 
@@ -40,6 +41,10 @@ To run the project locally, follow these steps:
 
 E-Gommerce uses [Task](https://taskfile.dev/) for task automation. Alternatively, you can use [the standard Go commands](https://go.dev/doc/tutorial/getting-started) to build and run the project.
 
+### Live Reloading
+
+To enable live reloading, install [Air](https://github.com/cosmtrek/air) and run `air` in the project directory. This will automatically rebuild and restart the project when changes are detected. It is configured to put the build in the `tmp` directory, which is ignored by Git and destroyed when it stops running. Configuration for Air is stored in the [`.air.toml`](./.air.toml) file.
+
 ### Task Automation
 
 Available tasks include:
@@ -49,6 +54,8 @@ Available tasks include:
 - `task test`: Runs tests with coverage.
 - `task swag`: Generates [Swagger](https://swagger.io/) documentation using [swag](https://github.com/swaggo/swag).
 - `task pcc`: Runs Pre-Commit Checks (PCCs). This performs linting, testing, and Swagger documentation generation in the correct order.
+
+Configuration for Task is stored in the [Taskfile.yml](./Taskfile.yml) file.
 
 ### Manual
 
