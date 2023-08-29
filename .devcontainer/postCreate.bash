@@ -11,3 +11,6 @@ go install github.com/go-task/task/v3/cmd/task@latest
 
 # install swag for swagger docs generation
 go install github.com/swaggo/swag/cmd/swag@latest
+
+# install air for live reloading
+go install github.com/cosmtrek/air@latest
