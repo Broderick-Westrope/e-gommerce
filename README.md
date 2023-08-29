@@ -4,14 +4,18 @@
 
 E-Gommerce is a powerful and comprehensive Go-based web API for building scalable e-commerce applications. The primary objective of this project is to serve as a valuable resource for developers learning Go, providing a well-structured template for building APIs while adhering to best practices and Go idioms. The project aims to strike a balance between being approachable for beginners and offering in-depth insights into creating robust APIs.
 
+If you feel the project is not approachable or could be improved in any way, please [open an issue](https://github.com/Broderick-Westrope/e-gommerce/issues/new/choose). I am always looking for ways to improve the project and make it more accessible to developers of all skill levels.
+
 ## Features
 
-- Create a user account and perform user authentication.
 - Browse products and retrieve detailed product information.
+- User-friendly error handling and messaging.
+- Detailed API documentation using Swagger.
+
+Coming Soon:
+- Create a user account and perform user authentication.
 - Favorite items for future reference.
 - Add items to the cart for purchase.
-- Implement user-friendly error handling and messaging.
-- Detailed API documentation using Swagger.
 
 ## Target Audience
 
@@ -21,12 +25,16 @@ E-Gommerce is designed for developers who are learning Go and want to explore re
 
 - Routing: [Chi](https://go-chi.io/)
 - Middleware: [httprate](https://github.com/go-chi/httprate), Logger, Heartbeat, CleanPath, AllowContentType, Recoverer, RedirectSlashes, Limit (See [Chi Middleware](https://go-chi.io/#/pages/middleware))
-- Database: MariaDB with [go-sql-driver/mysql](https://github.com/go-sql-driver/mysql)
+- Database: [MariaDB](https://mariadb.org/) with [go-sql-driver/mysql](https://github.com/go-sql-driver/mysql).
 - Environment Variables: [joho/godotenv](https://github.com/joho/godotenv)
 - Swagger Documentation: [swaggo/swag](https://github.com/swaggo/swag) and [swaggo/http-swagger](https://github.com/swaggo/http-swagger)
 - [Task Automation](#task-automation): [Taskfile](https://taskfile.dev/)
 - Linting: [golangci-lint](https://golangci-lint.run/)
 - [Live Reloading](#live-reloading): [Air](https://github.com/cosmtrek/air)
+
+## Infrastructure
+
+- Database: [Azure Database for MariaDB](https://learn.microsoft.com/en-us/azure/mariadb/)
 
 ## Installation
 
@@ -87,11 +95,11 @@ If you are unsure about any of these please reach out to me at [broderickwestrop
 ## Future Plans
 
 - Implement [Vue 3](https://vuejs.org/) frontend for a user-friendly browsing experience.
-- Enhance authentication and authorization mechanisms.
+- Implement authentication and authorization mechanisms.
 - Finalize core functionalities for the cart, favorites, and user actions.
 - Implement automated deployment strategies.
 - Establish a vibrant open-source community around the project.
-- Create educational blog posts and documentation to guide developers in using and contributing to the project.
+- Create educational blog posts and documentation to guide developers in using and contributing to the project, and replicating its features.
 
 ## Documentation
 
