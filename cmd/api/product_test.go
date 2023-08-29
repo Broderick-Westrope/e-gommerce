@@ -319,24 +319,20 @@ func TestServer_ProductRoutes_DeleteProduct(t *testing.T) {
 
 	tt := []struct {
 		name               string
-		id                 string
-		existingProduct    models.CreateProductRequest
+		id                 interface{}
 		expectedStatusCode int
 	}{
 		{
-			"happy path", fmt.Sprint(1),
-			models.CreateProductRequest{
-				Name:          "Test Product",
-				Description:   "Test Description",
-				StockQuantity: 10,
-				Price:         1.99,
-			},
+			"happy path", 1,
 			http.StatusNoContent,
 		},
 		{
-			"bad id param", "not-an-id",
-			models.CreateProductRequest{},
+			"id not int", "not-an-id",
 			http.StatusBadRequest,
+		},
+		{
+			"id not found", 200,
+			http.StatusNotFound,
 		},
 	}
 

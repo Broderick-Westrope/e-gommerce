@@ -51,9 +51,10 @@ func (t *TestStore) DeleteProduct(id int) error {
 	for i, product := range *t.Products {
 		if product.ID == id {
 			*t.Products = append((*t.Products)[:i], (*t.Products)[i+1:]...)
+			return nil
 		}
 	}
-	return nil
+	return &NotFoundError{fmt.Sprintf("Product with ID %d not found", id)}
 }
 
 func (t *TestStore) Close() error {

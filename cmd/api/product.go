@@ -179,6 +179,12 @@ func deleteProduct(srv Server) http.HandlerFunc {
 
 		err = srv.Storage().DeleteProduct(id)
 		if err != nil {
+			var notFoundErr *storage.NotFoundError
+			if errors.As(err, &notFoundErr) {
+				messages := []string{"Product not found", "delete_product_error", notFoundErr.Error()}
+				respondWithError(w, srv.Logger(), http.StatusNotFound, messages...)
+				return
+			}
 			messages := []string{"Failed to delete product", "delete_product_error", err.Error()}
 			respondWithError(w, srv.Logger(), http.StatusInternalServerError, messages...)
 			return
