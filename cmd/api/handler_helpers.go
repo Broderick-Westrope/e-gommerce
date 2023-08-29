@@ -18,7 +18,7 @@ type idResponse struct {
 	ID int `json:"id"`
 }
 
-// respondWithJSON is a helper function to respond with the JSON payload.
+// A helper function to respond on w with the JSON payload.
 // It also sets the Content-Type header to application/json.
 // If the JSON payload cannot be encoded, it will write an Internal Server Error to the response.
 func respondWithJSON(w http.ResponseWriter, logger config.Logger, statusCode int, payload interface{}) {
@@ -50,28 +50,31 @@ func respondWithJSON(w http.ResponseWriter, logger config.Logger, statusCode int
 	}
 }
 
-// respondWithID is a helper function to respond with an idResponse.
+// A helper function to respond on w with an idResponse constructed using id.
 // It also sets the Content-Type header to application/json.
 func respondWithID(w http.ResponseWriter, logger config.Logger, statusCode int, id int) {
 	response := idResponse{id}
 	respondWithJSON(w, logger, statusCode, response)
 }
 
-// respondWithError is a helper function to respond with an errorResponse.
-// It also sets the Content-Type header to application/json.
-// It will log all messages to the logger. Check the logger implementation for more details.
+// Constructs an errorResponse using createErrorResponse and calls respondWithJSON.
+// See createErrorResponse and respondWithJSON for more details.
 func respondWithError(w http.ResponseWriter, logger config.Logger, statusCode int, messages ...string) {
 	errResponse := createErrorResponse(logger, messages...)
 	respondWithJSON(w, logger, statusCode, errResponse)
 }
 
-// parseJSONBody unmarshals the JSON payload and stores the result in the provided destination.
+// Unmarshals the JSON payload stored in the body of r.
+// The result is stored in dst.
+// An error is returned if the JSON payload cannot be unmarshalled.
 func parseJSONBody(r *http.Request, dst interface{}) error {
 	return json.NewDecoder(r.Body).Decode(dst)
 }
 
-// createErrorResponse is a helper function to create an errorResponse using all the first message.
-// It will log all messages to the logger. Check the logger implementation for more details.
+// Creates a ULID error ID.
+// Creates an errorResponse with the error ID and the first value in messages and returns it.
+// Logs the error ID and all values in messages to the logger.
+// See the logger.Error() implementation for more details on how the messages are logged.
 func createErrorResponse(logger config.Logger, messages ...string) errorResponse {
 	errID := ulid.Make()
 	response := errorResponse{ID: errID.String(), Error: messages[0]}
