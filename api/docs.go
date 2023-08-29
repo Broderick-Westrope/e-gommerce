@@ -47,7 +47,7 @@ const docTemplate = `{
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/api.errorResponse"
+                            "$ref": "#/definitions/web.errorResponse"
                         }
                     }
                 }
@@ -80,13 +80,13 @@ const docTemplate = `{
                     "201": {
                         "description": "Product ID",
                         "schema": {
-                            "$ref": "#/definitions/api.idResponse"
+                            "$ref": "#/definitions/web.idResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/api.errorResponse"
+                            "$ref": "#/definitions/web.errorResponse"
                         }
                     }
                 }
@@ -122,19 +122,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid parameter 'id'",
                         "schema": {
-                            "$ref": "#/definitions/api.errorResponse"
+                            "$ref": "#/definitions/web.errorResponse"
                         }
                     },
                     "404": {
                         "description": "Product not found",
                         "schema": {
-                            "$ref": "#/definitions/api.errorResponse"
+                            "$ref": "#/definitions/web.errorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/api.errorResponse"
+                            "$ref": "#/definitions/web.errorResponse"
                         }
                     }
                 }
@@ -177,13 +177,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid parameter 'id'",
                         "schema": {
-                            "$ref": "#/definitions/api.errorResponse"
+                            "$ref": "#/definitions/web.errorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/api.errorResponse"
+                            "$ref": "#/definitions/web.errorResponse"
                         }
                     }
                 }
@@ -211,13 +211,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid parameter 'id'",
                         "schema": {
-                            "$ref": "#/definitions/api.errorResponse"
+                            "$ref": "#/definitions/web.errorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/api.errorResponse"
+                            "$ref": "#/definitions/web.errorResponse"
                         }
                     }
                 }
@@ -225,25 +225,6 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "api.errorResponse": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string"
-                },
-                "error_id": {
-                    "type": "string"
-                }
-            }
-        },
-        "api.idResponse": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "integer"
-                }
-            }
-        },
         "models.CreateProductRequest": {
             "type": "object",
             "properties": {
@@ -290,6 +271,25 @@ const docTemplate = `{
                 "valid": {
                     "description": "Valid is true if String is not NULL",
                     "type": "boolean"
+                }
+            }
+        },
+        "web.errorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                },
+                "error_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "web.idResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
                 }
             }
         }

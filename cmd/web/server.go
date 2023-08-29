@@ -1,13 +1,14 @@
-package api
+package web
 
 import (
 	"net/http"
 	"time"
 
-	// Required for swagger docs.
-	_ "github.com/Broderick-Westrope/e-gommerce/api"
 	"github.com/Broderick-Westrope/e-gommerce/internal/config"
 	"github.com/Broderick-Westrope/e-gommerce/internal/storage"
+
+	// api is required for swagger docs.
+	_ "github.com/Broderick-Westrope/e-gommerce/api"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/httprate"

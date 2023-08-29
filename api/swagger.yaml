@@ -1,17 +1,5 @@
 basePath: /v1/api
 definitions:
-  api.errorResponse:
-    properties:
-      error:
-        type: string
-      error_id:
-        type: string
-    type: object
-  api.idResponse:
-    properties:
-      id:
-        type: integer
-    type: object
   models.CreateProductRequest:
     properties:
       description:
@@ -44,6 +32,18 @@ definitions:
         description: Valid is true if String is not NULL
         type: boolean
     type: object
+  web.errorResponse:
+    properties:
+      error:
+        type: string
+      error_id:
+        type: string
+    type: object
+  web.idResponse:
+    properties:
+      id:
+        type: integer
+    type: object
 externalDocs:
   description: GitHub repository
   url: https://github.com/Broderick-Westrope/e-gommerce
@@ -75,7 +75,7 @@ paths:
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/api.errorResponse'
+            $ref: '#/definitions/web.errorResponse'
       summary: Get all products
       tags:
       - products
@@ -97,11 +97,11 @@ paths:
         "201":
           description: Product ID
           schema:
-            $ref: '#/definitions/api.idResponse'
+            $ref: '#/definitions/web.idResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/api.errorResponse'
+            $ref: '#/definitions/web.errorResponse'
       summary: Create a product
       tags:
       - products
@@ -121,11 +121,11 @@ paths:
         "400":
           description: Invalid parameter 'id'
           schema:
-            $ref: '#/definitions/api.errorResponse'
+            $ref: '#/definitions/web.errorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/api.errorResponse'
+            $ref: '#/definitions/web.errorResponse'
       summary: Delete a product
       tags:
       - products
@@ -148,15 +148,15 @@ paths:
         "400":
           description: Invalid parameter 'id'
           schema:
-            $ref: '#/definitions/api.errorResponse'
+            $ref: '#/definitions/web.errorResponse'
         "404":
           description: Product not found
           schema:
-            $ref: '#/definitions/api.errorResponse'
+            $ref: '#/definitions/web.errorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/api.errorResponse'
+            $ref: '#/definitions/web.errorResponse'
       summary: Get a product
       tags:
       - products
@@ -185,11 +185,11 @@ paths:
         "400":
           description: Invalid parameter 'id'
           schema:
-            $ref: '#/definitions/api.errorResponse'
+            $ref: '#/definitions/web.errorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/api.errorResponse'
+            $ref: '#/definitions/web.errorResponse'
       summary: Update a product
       tags:
       - products

@@ -55,7 +55,7 @@ Available tasks include:
 - Build: `mkdir -p build` then `go build -o ./build/ .`
 - Test: `go test ./... -cover`
 - Lint: `golangci-lint run`
-- Generate [Swagger](https://swagger.io/) Docs: `swag init -o './api' -g './cmd/api/server.go' --parseDependency`, then `swag fmt` to format
+- Generate [Swagger](https://swagger.io/) Docs: `swag init -o './api' -g './cmd/web/server.go' --parseDependency`, then `swag fmt` to format
 
 ## Contributing
 

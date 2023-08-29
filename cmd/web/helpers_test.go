@@ -1,11 +1,11 @@
-package api_test
+package web_test
 
 import (
 	"fmt"
 	"reflect"
 	"testing"
 
-	"github.com/Broderick-Westrope/e-gommerce/cmd/api"
+	"github.com/Broderick-Westrope/e-gommerce/cmd/web"
 	"github.com/Broderick-Westrope/e-gommerce/internal/models"
 )
 
@@ -17,7 +17,7 @@ func checkEqual(t *testing.T, got, want interface{}, msg string) {
 	}
 }
 
-func addProducts(t *testing.T, srv api.Server, products []models.CreateProductRequest) {
+func addProducts(t *testing.T, srv web.Server, products []models.CreateProductRequest) {
 	t.Helper()
 
 	for _, p := range products {
@@ -28,7 +28,7 @@ func addProducts(t *testing.T, srv api.Server, products []models.CreateProductRe
 	}
 }
 
-func removeProducts(t *testing.T, srv api.Server, products []models.Product) {
+func removeProducts(t *testing.T, srv web.Server, products []models.Product) {
 	t.Helper()
 
 	for _, p := range products {

@@ -1,7 +1,7 @@
-package api_test
+package web_test
 
 import (
-	"github.com/Broderick-Westrope/e-gommerce/cmd/api"
+	"github.com/Broderick-Westrope/e-gommerce/cmd/web"
 	"github.com/Broderick-Westrope/e-gommerce/internal/config"
 	"github.com/Broderick-Westrope/e-gommerce/internal/models"
 	"github.com/Broderick-Westrope/e-gommerce/internal/storage"
@@ -40,7 +40,7 @@ func (srv *testServer) RateLimit() int {
 
 func (srv *testServer) MountHandlers() {
 	srv.mux.Route("/v1", func(r chi.Router) {
-		r.Mount("/api/products", api.ProductRoutes(srv))
+		r.Mount("/api/products", web.ProductRoutes(srv))
 	})
 }
 

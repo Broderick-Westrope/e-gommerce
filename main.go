@@ -3,7 +3,7 @@ package main
 import (
 	"net/http"
 
-	"github.com/Broderick-Westrope/e-gommerce/cmd/api"
+	"github.com/Broderick-Westrope/e-gommerce/cmd/web"
 	"github.com/Broderick-Westrope/e-gommerce/internal/config"
 )
 
@@ -11,7 +11,7 @@ func main() {
 	// TODO: Find a cleaner way to defer the closing of the database connection
 	config := config.New()
 
-	srv := api.NewServer("chi", config)
+	srv := web.NewServer("chi", config)
 	defer srv.Storage().Close()
 	srv.MountHandlers()
 
