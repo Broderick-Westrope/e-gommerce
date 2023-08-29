@@ -79,9 +79,17 @@ func (m Maria) UpdateProduct(product *models.Product) error {
 	UPDATE products
 	SET name = ?, description = ?, price = ?, stock_quantity = ?
 	WHERE id = ?`
-	_, err := m.DB.Exec(query, product.Name, product.Description, product.Price, product.StockQuantity, product.ID)
+	result, err := m.DB.Exec(query, product.Name, product.Description, product.Price, product.StockQuantity, product.ID)
 	if err != nil {
 		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("Error getting rows affected: %s", err.Error())
+	}
+	if rowsAffected == 0 {
+		return &NotFoundError{Operation: fmt.Sprintf("Maria.UpdateProduct(%d)", product.ID)}
 	}
 	return nil
 }

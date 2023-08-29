@@ -11,7 +11,7 @@ tasks:
   test:
     desc: "run all unit tests"
     cmds:
-      - go test ./... -cover
+      - go test ./... -cover {{.CLI_ARGS}}
   lint:
     desc: "lint the code"
     cmds:

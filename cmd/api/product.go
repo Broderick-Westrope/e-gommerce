@@ -65,9 +65,10 @@ func getProduct(srv Server) http.HandlerFunc {
 
 		product, err := srv.Storage().GetProduct(id)
 		if err != nil {
-			var target *storage.NotFoundError
-			if errors.As(err, &target) {
-				respondWithError(w, srv.Logger(), http.StatusNotFound, "Product not found")
+			var notFoundErr *storage.NotFoundError
+			if errors.As(err, &notFoundErr) {
+				messages := []string{"Product not found", "get_product_error", notFoundErr.Error()}
+				respondWithError(w, srv.Logger(), http.StatusNotFound, messages...)
 				return
 			}
 			messages := []string{"Failed to get product", "get_product_error", err.Error()}
@@ -143,6 +144,12 @@ func updateProduct(srv Server) http.HandlerFunc {
 		product := createProductReq.ToProduct(id)
 		err = srv.Storage().UpdateProduct(product)
 		if err != nil {
+			var notFoundErr *storage.NotFoundError
+			if errors.As(err, &notFoundErr) {
+				messages := []string{"Product not found", "update_product_error", notFoundErr.Error()}
+				respondWithError(w, srv.Logger(), http.StatusNotFound, messages...)
+				return
+			}
 			messages := []string{"Failed to update product", "update_product_error", err.Error()}
 			respondWithError(w, srv.Logger(), http.StatusInternalServerError, messages...)
 			return

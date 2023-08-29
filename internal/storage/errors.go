@@ -1,9 +1,11 @@
 package storage
 
+import "fmt"
+
 type NotFoundError struct {
 	Operation string
 }
 
 func (e *NotFoundError) Error() string {
-	return "Not found: " + e.Operation
+	return fmt.Sprintf("Not found: %s", e.Operation)
 }

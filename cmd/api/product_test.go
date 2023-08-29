@@ -231,13 +231,13 @@ func TestServer_ProductRoutes_UpdateProduct(t *testing.T) {
 
 	tt := []struct {
 		name               string
-		id                 string
+		id                 interface{}
 		existingProduct    models.CreateProductRequest
 		updatedProduct     models.CreateProductRequest
 		expectedStatusCode int
 	}{
 		{
-			"happy path", fmt.Sprint(1),
+			"happy path", 1,
 			models.CreateProductRequest{
 				Name:          "Test Product",
 				Description:   "Test Description",
@@ -252,7 +252,7 @@ func TestServer_ProductRoutes_UpdateProduct(t *testing.T) {
 			http.StatusNoContent,
 		},
 		{
-			"bad id param", "not-an-id",
+			"id not int", "not-an-id",
 			models.CreateProductRequest{
 				Name:          "Test Product",
 				Description:   "Test Description",
@@ -266,6 +266,21 @@ func TestServer_ProductRoutes_UpdateProduct(t *testing.T) {
 			},
 			http.StatusBadRequest,
 		},
+		{
+			"id not found", 200,
+			models.CreateProductRequest{
+				Name:          "Test Product",
+				Description:   "Test Description",
+				StockQuantity: 10,
+				Price:         1.99,
+			},
+			models.CreateProductRequest{
+				Name:          "Test Product 2",
+				Description:   "Test Description 2",
+				StockQuantity: 20,
+			},
+			http.StatusNotFound,
+		},
 	}
 
 	for _, tc := range tt {
@@ -274,6 +289,7 @@ func TestServer_ProductRoutes_UpdateProduct(t *testing.T) {
 			if err != nil {
 				t.Error(fmt.Errorf("Error creating product: %w", err))
 			}
+			defer removeProducts(t, srv, []models.Product{{ID: productID}})
 
 			rr := httptest.NewRecorder()
 			body := new(bytes.Buffer)
@@ -290,11 +306,6 @@ func TestServer_ProductRoutes_UpdateProduct(t *testing.T) {
 			srv.Mux().ServeHTTP(rr, req)
 
 			checkEqual(t, rr.Code, tc.expectedStatusCode, "Status Code")
-
-			err = srv.Storage().DeleteProduct(productID)
-			if err != nil {
-				t.Error(fmt.Errorf("Error deleting product: %w", err))
-			}
 		})
 	}
 }

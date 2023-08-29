@@ -41,9 +41,10 @@ func (t *TestStore) UpdateProduct(product *models.Product) error {
 	for i, p := range *t.Products {
 		if p.ID == product.ID {
 			(*t.Products)[i] = *product
+			return nil
 		}
 	}
-	return nil
+	return &NotFoundError{fmt.Sprintf("Product with ID %d not found", product.ID)}
 }
 
 func (t *TestStore) DeleteProduct(id int) error {
