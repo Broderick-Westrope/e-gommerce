@@ -2,6 +2,7 @@ package storage
 
 import "fmt"
 
+// NotFoundError is an error that is returned when a resource is not found.
 type NotFoundError struct {
 	Operation string
 }

@@ -7,6 +7,7 @@ import (
 	"github.com/Broderick-Westrope/e-gommerce/internal/models"
 )
 
+// Maria is an implementation of the Storage interface using MariaDB.
 type Maria struct {
 	DB *sql.DB
 }
@@ -17,6 +18,7 @@ func NewMaria(db *sql.DB) *Maria {
 	}
 }
 
+// GetProduct returns a product by id.
 func (m Maria) GetProduct(id int) (*models.Product, error) {
 	query := `
 	SELECT * 
@@ -35,6 +37,7 @@ func (m Maria) GetProduct(id int) (*models.Product, error) {
 	return result, nil
 }
 
+// GetProducts returns all products.
 func (m Maria) GetProducts() (*[]models.Product, error) {
 	query := `
 	SELECT *
@@ -61,6 +64,7 @@ func (m Maria) GetProducts() (*[]models.Product, error) {
 	return result, nil
 }
 
+// CreateProduct creates a product.
 func (m Maria) CreateProduct(product *models.CreateProductRequest) (int, error) {
 	query := `
 	INSERT INTO products (name, description, price, stock_quantity)
@@ -74,6 +78,7 @@ func (m Maria) CreateProduct(product *models.CreateProductRequest) (int, error) 
 	return int(id), err
 }
 
+// UpdateProduct updates a product.
 func (m Maria) UpdateProduct(product *models.Product) error {
 	query := `
 	UPDATE products
@@ -94,6 +99,7 @@ func (m Maria) UpdateProduct(product *models.Product) error {
 	return nil
 }
 
+// DeleteProduct deletes a product by id.
 func (m Maria) DeleteProduct(id int) error {
 	query := `
 	DELETE FROM products

@@ -8,11 +8,11 @@ import (
 )
 
 func main() {
-	// TODO: Find a cleaner way to defer the closing of the database connection
 	config := config.New()
 
 	srv := web.NewServer("chi", config)
 	defer srv.Storage().Close()
+
 	srv.MountHandlers()
 
 	httpServer := &http.Server{

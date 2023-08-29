@@ -2,6 +2,7 @@ package models
 
 import "database/sql"
 
+// Product is a struct that defines the fields of a product.
 type Product struct {
 	ID            int            `json:"id"`
 	Name          string         `json:"name"`
@@ -10,6 +11,7 @@ type Product struct {
 	StockQuantity int            `json:"stock_quantity"`
 }
 
+// CreateProductRequest is a struct that defines the fields required to create a product.
 type CreateProductRequest struct {
 	Name          string  `json:"name"`
 	Description   string  `json:"description"`
@@ -17,6 +19,7 @@ type CreateProductRequest struct {
 	StockQuantity int     `json:"stock_quantity"`
 }
 
+// ToProduct converts a CreateProductRequest to a Product with the given id.
 func (c *CreateProductRequest) ToProduct(id int) *Product {
 	var isValid bool
 	if c.Description == "" {

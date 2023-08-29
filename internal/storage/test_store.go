@@ -6,6 +6,7 @@ import (
 	"github.com/Broderick-Westrope/e-gommerce/internal/models"
 )
 
+// TestStore is an implementation of the Storage interface using in memory storage.
 type TestStore struct {
 	Products *[]models.Product
 }
@@ -16,6 +17,7 @@ func NewTestStore() *TestStore {
 	}
 }
 
+// GetProduct returns a product by id.
 func (t *TestStore) GetProduct(id int) (*models.Product, error) {
 	for _, product := range *t.Products {
 		if product.ID == id {
@@ -25,10 +27,12 @@ func (t *TestStore) GetProduct(id int) (*models.Product, error) {
 	return nil, &NotFoundError{fmt.Sprintf("Product with ID %d not found", id)}
 }
 
+// GetProducts returns all products.
 func (t *TestStore) GetProducts() (*[]models.Product, error) {
 	return t.Products, nil
 }
 
+// CreateProduct creates a product.
 func (t *TestStore) CreateProduct(product *models.CreateProductRequest) (int, error) {
 	p := product.ToProduct(len(*t.Products) + 1)
 	p.ID = len(*t.Products) + 1
@@ -37,6 +41,7 @@ func (t *TestStore) CreateProduct(product *models.CreateProductRequest) (int, er
 	return p.ID, nil
 }
 
+// UpdateProduct updates a product.
 func (t *TestStore) UpdateProduct(product *models.Product) error {
 	for i, p := range *t.Products {
 		if p.ID == product.ID {
@@ -47,6 +52,7 @@ func (t *TestStore) UpdateProduct(product *models.Product) error {
 	return &NotFoundError{fmt.Sprintf("Product with ID %d not found", product.ID)}
 }
 
+// DeleteProduct deletes a product.
 func (t *TestStore) DeleteProduct(id int) error {
 	for i, product := range *t.Products {
 		if product.ID == id {

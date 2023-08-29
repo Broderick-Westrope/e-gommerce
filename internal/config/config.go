@@ -12,6 +12,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
+// Config is an interface that defines the methods required for a config.
 type Config interface {
 	Addr() string
 	ReadHeaderTimeout() time.Duration
@@ -20,6 +21,7 @@ type Config interface {
 	RateLimit() int
 }
 
+// config is an implementation of the Config interface.
 type config struct {
 	addr              *string
 	readHeaderTimeout *time.Duration
@@ -84,6 +86,7 @@ func New() Config {
 	}
 }
 
+// setupDB returns a new sql.DB based on the environment variables.
 func setupDB(logger Logger) *sql.DB {
 	dbUsername, dbPassword, dbAddress, dbName := getDBEnvVariables(logger)
 

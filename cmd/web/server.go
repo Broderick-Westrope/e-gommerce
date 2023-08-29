@@ -15,6 +15,7 @@ import (
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
+// Server is an interface that defines the methods required for a server.
 type Server interface {
 	Mux() *chi.Mux
 	Storage() storage.Storage
@@ -23,6 +24,7 @@ type Server interface {
 	MountHandlers()
 }
 
+// chiServer is an implementation of the Server interface.
 type chiServer struct {
 	mux       *chi.Mux
 	storage   storage.Storage
@@ -60,6 +62,8 @@ func (srv *chiServer) RateLimit() int {
 	return srv.rateLimit
 }
 
+// MountHandlers mounts the routes and middleware to the server.
+// It also sets up the swagger docs, and a walk function to log the routes and middleware.
 //	@title			E-Gommerce API
 //	@version		0.1
 //	@description	A toy e-commerce backend made with Go.
