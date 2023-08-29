@@ -13,11 +13,11 @@ import (
 func ProductRoutes(srv Server) *chi.Mux {
 	router := chi.NewRouter()
 
-	router.Get("/", getProducts(srv))
-	router.Get("/{id}", getProduct(srv))
-	router.Post("/", createProduct(srv))
-	router.Put("/{id}", updateProduct(srv))
-	router.Delete("/{id}", deleteProduct(srv))
+	router.Get("/", handleGetProducts(srv))
+	router.Get("/{id}", handleGetProductByID(srv))
+	router.Post("/", handleCreateProduct(srv))
+	router.Put("/{id}", handleUpdateProductByID(srv))
+	router.Delete("/{id}", handleDeleteProductByID(srv))
 
 	return router
 }
@@ -30,7 +30,7 @@ func ProductRoutes(srv Server) *chi.Mux {
 //	@Success		200	{array}		models.Product	"Products"
 //	@Failure		500	{object}	errorResponse	"Internal Server Error"
 //	@Router			/products [get]
-func getProducts(srv Server) http.HandlerFunc {
+func handleGetProducts(srv Server) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		products, err := srv.Storage().GetProducts()
 		if err != nil {
@@ -54,7 +54,7 @@ func getProducts(srv Server) http.HandlerFunc {
 //	@Failure		404	{object}	errorResponse	"Product not found"
 //	@Failure		500	{object}	errorResponse	"Internal Server Error"
 //	@Router			/products/{id} [get]
-func getProduct(srv Server) http.HandlerFunc {
+func handleGetProductByID(srv Server) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.Atoi(chi.URLParam(r, "id"))
 		if err != nil {
@@ -90,7 +90,7 @@ func getProduct(srv Server) http.HandlerFunc {
 //	@Success		201		{object}	idResponse					"Product ID"
 //	@Failure		500		{object}	errorResponse				"Internal Server Error"
 //	@Router			/products [post]
-func createProduct(srv Server) http.HandlerFunc {
+func handleCreateProduct(srv Server) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var createProductReq models.CreateProductRequest
 		err := parseJSONBody(r, &createProductReq)
@@ -124,7 +124,7 @@ func createProduct(srv Server) http.HandlerFunc {
 //	@Failure		400	{object}	errorResponse	"Invalid parameter 'id'"
 //	@Failure		500	{object}	errorResponse	"Internal Server Error"
 //	@Router			/products/{id} [put]
-func updateProduct(srv Server) http.HandlerFunc {
+func handleUpdateProductByID(srv Server) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.Atoi(chi.URLParam(r, "id"))
 		if err != nil {
@@ -168,7 +168,7 @@ func updateProduct(srv Server) http.HandlerFunc {
 //	@Failure		400	{object}	errorResponse	"Invalid parameter 'id'"
 //	@Failure		500	{object}	errorResponse	"Internal Server Error"
 //	@Router			/products/{id} [delete]
-func deleteProduct(srv Server) http.HandlerFunc {
+func handleDeleteProductByID(srv Server) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.Atoi(chi.URLParam(r, "id"))
 		if err != nil {

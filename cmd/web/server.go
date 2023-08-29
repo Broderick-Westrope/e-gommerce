@@ -38,9 +38,9 @@ func NewServer(mode string, config config.Config) Server {
 	if mode == "chi" {
 		return &chiServer{
 			mux:       chi.NewMux(),
-			storage:   config.Storage(),
-			logger:    config.Logger(),
-			rateLimit: config.RateLimit(),
+			storage:   config.Storage,
+			logger:    config.Logger,
+			rateLimit: config.RateLimit,
 		}
 	}
 	return nil

@@ -12,51 +12,17 @@ import (
 	"github.com/joho/godotenv"
 )
 
-// Config is an interface that defines the methods required for a config.
-type Config interface {
-	Addr() string
-	ReadHeaderTimeout() time.Duration
-	Logger() Logger
-	Storage() storage.Storage
-	RateLimit() int
-}
-
 // config is an implementation of the Config interface.
-type config struct {
-	addr              *string
-	readHeaderTimeout *time.Duration
-	logger            Logger
-	storage           storage.Storage
-	rateLimit         int
-}
-
-// Addr returns the address to listen on.
-func (c *config) Addr() string {
-	return *c.addr
-}
-
-// ReadHeaderTimeout returns the read header timeout.
-func (c *config) ReadHeaderTimeout() time.Duration {
-	return *c.readHeaderTimeout
-}
-
-// Logger returns the logger.
-func (c *config) Logger() Logger {
-	return c.logger
-}
-
-// Storage returns the storage.
-func (c *config) Storage() storage.Storage {
-	return c.storage
-}
-
-// RateLimit returns the rate limit of requests per minute.
-func (c *config) RateLimit() int {
-	return c.rateLimit
+type Config struct {
+	Addr              *string
+	ReadHeaderTimeout *time.Duration
+	Logger            Logger
+	Storage           storage.Storage
+	RateLimit         int
 }
 
 // New returns a new config struct.
-func New() Config {
+func New() *Config {
 	addr := flag.String("addr", ":4000", "HTTP network address")
 	readHeaderTimeout := flag.Duration("read-header-timeout", 10*time.Second, "HTTP read header timeout")
 	rateLimit := flag.Int("rate-limit", 10, "requests per minute rate limit")
@@ -77,12 +43,12 @@ func New() Config {
 	db := setupDB(logger)
 	storage := storage.NewMaria(db)
 
-	return &config{
-		addr:              addr,
-		readHeaderTimeout: readHeaderTimeout,
-		logger:            logger,
-		storage:           storage,
-		rateLimit:         *rateLimit,
+	return &Config{
+		Addr:              addr,
+		ReadHeaderTimeout: readHeaderTimeout,
+		Logger:            logger,
+		Storage:           storage,
+		RateLimit:         *rateLimit,
 	}
 }
 
