@@ -157,5 +157,12 @@ fabric.properties
 .ionide
 
 # End of https://www.toptal.com/developers/gitignore/api/go,visualstudiocode,goland
+
+# Ignore .env file containing credentials, API keys, tokens, and passwords
 .env
+
+# Ignore build directory
 build/
+
+# Ignore temporary directory used by air for live reloading
+tmp/
