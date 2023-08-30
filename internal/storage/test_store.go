@@ -9,11 +9,13 @@ import (
 // TestStore is an implementation of the Storage interface using in memory storage.
 type TestStore struct {
 	Products *[]models.Product
+	Users    *[]models.User
 }
 
 func NewTestStore() *TestStore {
 	return &TestStore{
 		Products: &[]models.Product{},
+		Users:    &[]models.User{},
 	}
 }
 
@@ -61,6 +63,52 @@ func (t *TestStore) DeleteProduct(id int) error {
 		}
 	}
 	return &NotFoundError{fmt.Sprintf("Product with ID %d not found", id)}
+}
+
+// GetUser returns a user by id.
+func (t *TestStore) GetUser(id int) (*models.User, error) {
+	for _, user := range *t.Users {
+		if user.ID == id {
+			return &user, nil
+		}
+	}
+	return nil, &NotFoundError{fmt.Sprintf("User with ID %d not found", id)}
+}
+
+// GetUsers returns all users.
+func (t *TestStore) GetUsers() (*[]models.User, error) {
+	return t.Users, nil
+}
+
+// CreateUser creates a user.
+func (t *TestStore) CreateUser(user *models.CreateUserRequest) (int, error) {
+	u := user.ToUser(len(*t.Users) + 1)
+	u.ID = len(*t.Users) + 1
+	users := append(*t.Users, *u)
+	t.Users = &users
+	return u.ID, nil
+}
+
+// UpdateUser updates a user.
+func (t *TestStore) UpdateUser(user *models.User) error {
+	for i, u := range *t.Users {
+		if u.ID == user.ID {
+			(*t.Users)[i] = *user
+			return nil
+		}
+	}
+	return &NotFoundError{fmt.Sprintf("User with ID %d not found", user.ID)}
+}
+
+// DeleteUser deletes a user.
+func (t *TestStore) DeleteUser(id int) error {
+	for i, user := range *t.Users {
+		if user.ID == id {
+			*t.Users = append((*t.Users)[:i], (*t.Users)[i+1:]...)
+			return nil
+		}
+	}
+	return &NotFoundError{fmt.Sprintf("User with ID %d not found", id)}
 }
 
 func (t *TestStore) Close() error {

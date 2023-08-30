@@ -119,6 +119,87 @@ func (m Maria) DeleteProduct(id int) error {
 	return nil
 }
 
+// GetUser returns a user by id.
+func (m Maria) GetUser(id int) (*models.User, error) {
+	query := `
+	SELECT * 
+	FROM users 
+	WHERE id = ?`
+	row := m.DB.QueryRow(query, id)
+
+	result := &models.User{}
+	err := row.Scan(&result.ID, &result.Email, &result.Password)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, &NotFoundError{Operation: fmt.Sprintf("Maria.GetUser(%d)", id)}
+		}
+		return nil, err
+	}
+	return result, nil
+}
+
+// GetUsers returns all users.
+func (m Maria) GetUsers() (*[]models.User, error) {
+	query := `
+	SELECT *
+	FROM users`
+	rows, err := m.DB.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	result := &[]models.User{}
+	for rows.Next() {
+		row := models.User{}
+		err = rows.Scan(&row.ID, &row.Email, &row.Password)
+		if err != nil {
+			return nil, err
+		}
+		*result = append(*result, row)
+	}
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+// CreateUser creates a user.
+func (m Maria) CreateUser(user *models.CreateUserRequest) (int, error) {
+	query := `
+	INSERT INTO users (email, password)
+	VALUES (?, ?)`
+	result, err := m.DB.Exec(query, user.Email, user.Password)
+	if err != nil {
+		return 0, err
+	}
+	var id int64
+	id, err = result.LastInsertId()
+	return int(id), err
+}
+
+// UpdateUser updates a user.
+func (m Maria) UpdateUser(user *models.User) error {
+	query := `
+	UPDATE products
+	SET email = ?, password = ?
+	WHERE id = ?`
+	result, err := m.DB.Exec(query, user.Email, user.Password, user.ID)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("Error getting rows affected: %s", err.Error())
+	}
+	if rowsAffected == 0 {
+		return &NotFoundError{Operation: fmt.Sprintf("Maria.UpdateUser(%d)", user.ID)}
+	}
+	return nil
+}
+
 func (m Maria) Close() error {
 	return m.DB.Close()
 }
