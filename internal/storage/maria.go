@@ -200,6 +200,26 @@ func (m Maria) UpdateUser(user *models.User) error {
 	return nil
 }
 
+// DeleteUser deletes a user by id.
+func (m Maria) DeleteUser(id int) error {
+	query := `
+	DELETE FROM users
+	WHERE id = ?`
+	result, err := m.DB.Exec(query, id)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("Error getting rows affected: %s", err.Error())
+	}
+	if rowsAffected == 0 {
+		return &NotFoundError{Operation: fmt.Sprintf("Maria.DeleteProduct(%d)", id)}
+	}
+	return nil
+}
+
 func (m Maria) Close() error {
 	return m.DB.Close()
 }
