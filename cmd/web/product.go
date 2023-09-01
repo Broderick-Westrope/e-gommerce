@@ -1,12 +1,9 @@
 package web
 
 import (
-	"errors"
 	"net/http"
-	"strconv"
 
 	"github.com/Broderick-Westrope/e-gommerce/internal/models"
-	"github.com/Broderick-Westrope/e-gommerce/internal/storage"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -20,6 +17,15 @@ func ProductRoutes(srv Server) *chi.Mux {
 	router.Delete("/{id}", handleDeleteProductByID(srv))
 
 	return router
+}
+
+func requestToProduct(r *http.Request, id int) (*models.Product, error) {
+	var createProductReq models.CreateProductRequest
+	err := parseJSONBody(r, &createProductReq)
+	if err != nil {
+		return nil, err
+	}
+	return createProductReq.ToProduct(id), nil
 }
 
 //	@Summary		Get all products
@@ -76,38 +82,7 @@ func handleCreateProduct(srv Server) http.HandlerFunc {
 //	@Failure		500	{object}	errorResponse	"Internal Server Error"
 //	@Router			/products/{id} [put]
 func handleUpdateProductByID(srv Server) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		id, err := strconv.Atoi(chi.URLParam(r, "id"))
-		if err != nil {
-			messages := []string{"Invalid parameter 'id'", "atoi_error", err.Error()}
-			respondWithError(w, srv.Logger(), http.StatusBadRequest, messages...)
-			return
-		}
-
-		var createProductReq models.CreateProductRequest
-		err = parseJSONBody(r, &createProductReq)
-		if err != nil {
-			messages := []string{"Failed to parse JSON payload", "parse_json_body_error", err.Error()}
-			respondWithError(w, srv.Logger(), http.StatusInternalServerError, messages...)
-			return
-		}
-
-		product := createProductReq.ToProduct(id)
-		err = srv.Storage().UpdateProduct(product)
-		if err != nil {
-			var notFoundErr *storage.NotFoundError
-			if errors.As(err, &notFoundErr) {
-				messages := []string{"Product not found", "update_product_error", notFoundErr.Error()}
-				respondWithError(w, srv.Logger(), http.StatusNotFound, messages...)
-				return
-			}
-			messages := []string{"Failed to update product", "update_product_error", err.Error()}
-			respondWithError(w, srv.Logger(), http.StatusInternalServerError, messages...)
-			return
-		}
-
-		respondWithJSON(w, srv.Logger(), http.StatusNoContent, nil)
-	}
+	return handleUpdateEntityByID[models.Product](srv.Logger(), srv.Storage().UpdateProduct, requestToProduct)
 }
 
 //	@Summary		Delete a product

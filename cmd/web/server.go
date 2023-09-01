@@ -99,6 +99,7 @@ func (srv *chiServer) MountHandlers() {
 	// Routes
 	srv.mux.Route("/v1", func(r chi.Router) {
 		r.Mount("/api/products", ProductRoutes(srv))
+		r.Mount("/api/users", UserRoutes(srv))
 	})
 
 	// Walk the router to see the routes and middleware. Must be done after the routes are mounted.

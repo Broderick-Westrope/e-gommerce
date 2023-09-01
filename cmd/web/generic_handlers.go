@@ -71,6 +71,44 @@ func handleCreateEntity[T any](logger config.Logger, createFunc func(*T) (int, e
 	}
 }
 
+func handleUpdateEntityByID[T any](
+	logger config.Logger,
+	updateFunc func(*T) error,
+	reqToEntityFunc func(*http.Request, int) (*T, error),
+) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		id, err := strconv.Atoi(chi.URLParam(r, "id"))
+		if err != nil {
+			messages := []string{"Invalid parameter 'id'", "atoi_error", err.Error()}
+			respondWithError(w, logger, http.StatusBadRequest, messages...)
+			return
+		}
+
+		var entity *T
+		entity, err = reqToEntityFunc(r, id)
+		if err != nil {
+			messages := []string{"Failed to parse JSON payload", "parse_json_body_error", err.Error()}
+			respondWithError(w, logger, http.StatusInternalServerError, messages...)
+			return
+		}
+
+		err = updateFunc(entity)
+		if err != nil {
+			var notFoundErr *storage.NotFoundError
+			if errors.As(err, &notFoundErr) {
+				messages := []string{"Entity not found", "update_entity_error", notFoundErr.Error()}
+				respondWithError(w, logger, http.StatusNotFound, messages...)
+				return
+			}
+			messages := []string{"Failed to update entity", "update_entity_error", err.Error()}
+			respondWithError(w, logger, http.StatusInternalServerError, messages...)
+			return
+		}
+
+		respondWithJSON(w, logger, http.StatusNoContent, nil)
+	}
+}
+
 func handleDeleteEntityByID(logger config.Logger, deleteFunc func(int) error) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.Atoi(chi.URLParam(r, "id"))
