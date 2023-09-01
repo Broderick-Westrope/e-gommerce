@@ -31,16 +31,7 @@ func ProductRoutes(srv Server) *chi.Mux {
 //	@Failure		500	{object}	errorResponse	"Internal Server Error"
 //	@Router			/products [get]
 func handleGetProducts(srv Server) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		products, err := srv.Storage().GetProducts()
-		if err != nil {
-			messages := []string{"Failed to get products", "get_products_error", err.Error()}
-			respondWithError(w, srv.Logger(), http.StatusInternalServerError, messages...)
-			return
-		}
-
-		respondWithJSON(w, srv.Logger(), http.StatusOK, products)
-	}
+	return handleGetEntities[models.Product](srv.Logger(), srv.Storage().GetProducts)
 }
 
 //	@Summary		Get a product
@@ -55,29 +46,7 @@ func handleGetProducts(srv Server) http.HandlerFunc {
 //	@Failure		500	{object}	errorResponse	"Internal Server Error"
 //	@Router			/products/{id} [get]
 func handleGetProductByID(srv Server) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		id, err := strconv.Atoi(chi.URLParam(r, "id"))
-		if err != nil {
-			messages := []string{"Invalid parameter 'id'", "atoi_error", err.Error()}
-			respondWithError(w, srv.Logger(), http.StatusBadRequest, messages...)
-			return
-		}
-
-		product, err := srv.Storage().GetProduct(id)
-		if err != nil {
-			var notFoundErr *storage.NotFoundError
-			if errors.As(err, &notFoundErr) {
-				messages := []string{"Product not found", "get_product_error", notFoundErr.Error()}
-				respondWithError(w, srv.Logger(), http.StatusNotFound, messages...)
-				return
-			}
-			messages := []string{"Failed to get product", "get_product_error", err.Error()}
-			respondWithError(w, srv.Logger(), http.StatusInternalServerError, messages...)
-			return
-		}
-
-		respondWithJSON(w, srv.Logger(), http.StatusOK, product)
-	}
+	return handleGetEntityByID[models.Product](srv.Logger(), srv.Storage().GetProduct)
 }
 
 //	@Summary		Create a product
@@ -91,25 +60,7 @@ func handleGetProductByID(srv Server) http.HandlerFunc {
 //	@Failure		500		{object}	errorResponse				"Internal Server Error"
 //	@Router			/products [post]
 func handleCreateProduct(srv Server) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		var createProductReq models.CreateProductRequest
-		err := parseJSONBody(r, &createProductReq)
-		if err != nil {
-			messages := []string{"Failed to parse JSON payload", "parse_json_body_error", err.Error()}
-			respondWithError(w, srv.Logger(), http.StatusInternalServerError, messages...)
-			return
-		}
-
-		var id int
-		id, err = srv.Storage().CreateProduct(&createProductReq)
-		if err != nil {
-			messages := []string{"Failed to create product", "create_product_error", err.Error()}
-			respondWithError(w, srv.Logger(), http.StatusInternalServerError, messages...)
-			return
-		}
-
-		respondWithID(w, srv.Logger(), http.StatusCreated, id)
-	}
+	return handleCreateEntity[models.CreateProductRequest](srv.Logger(), srv.Storage().CreateProduct)
 }
 
 //	@Summary		Update a product
@@ -169,27 +120,5 @@ func handleUpdateProductByID(srv Server) http.HandlerFunc {
 //	@Failure		500	{object}	errorResponse	"Internal Server Error"
 //	@Router			/products/{id} [delete]
 func handleDeleteProductByID(srv Server) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		id, err := strconv.Atoi(chi.URLParam(r, "id"))
-		if err != nil {
-			messages := []string{"Invalid parameter 'id'", "atoi_error", err.Error()}
-			respondWithError(w, srv.Logger(), http.StatusBadRequest, messages...)
-			return
-		}
-
-		err = srv.Storage().DeleteProduct(id)
-		if err != nil {
-			var notFoundErr *storage.NotFoundError
-			if errors.As(err, &notFoundErr) {
-				messages := []string{"Product not found", "delete_product_error", notFoundErr.Error()}
-				respondWithError(w, srv.Logger(), http.StatusNotFound, messages...)
-				return
-			}
-			messages := []string{"Failed to delete product", "delete_product_error", err.Error()}
-			respondWithError(w, srv.Logger(), http.StatusInternalServerError, messages...)
-			return
-		}
-
-		respondWithJSON(w, srv.Logger(), http.StatusNoContent, nil)
-	}
+	return handleDeleteEntityByID(srv.Logger(), srv.Storage().DeleteProduct)
 }
